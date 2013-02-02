@@ -68,17 +68,51 @@ function CreateCtrl($scope, $location, List) {
 // CreateCtrl is the controller for viewing and updating lists.
 function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
+		// Cancel the update checks when we leave.
 		$scope.$on('$destroy', function() {
-									 console.log("stopping timer");
 									 $timeout.cancel($scope.timer);
 							 });
 
-		// Force a save every 90 seconds if something has changed.
-		// $scope.refresh = function() {
-		// 		$scope.save();
-		// 		$scope.timer = $timeout($scope.refresh, 90000);
-		// };
-		// $scope.timer = $timeout($scope.refresh, 90000);
+		// Check for changes every 30 seconds.
+		$scope.checkupdate = function() {
+				List.checkupdate($scope.list, function(u) {
+														 $scope.updatable = u;
+
+														 // If there are no changes and we have
+														 // changes, let's save them.
+														 if (u == false && $scope.dirty) {
+																 $scope.save();
+														 }
+												 });
+				$scope.timer = $timeout($scope.checkupdate, 5000);
+		};
+		$scope.timer = $timeout($scope.checkupdate, 5000);
+
+		$scope.update = function() {
+				if ($scope.dirty) {
+						// Ask them if they want to merge their changes.
+						$('#updateModal').modal();
+				} else {
+						List.get($routeParams.id, function(l) {
+												 $scope.list = l;
+										 });
+						$scope.updatable = false;
+				}
+		};
+
+		$scope.updatemerge = function() {
+				$scope.save();	
+				$scope.updatable = false;
+				$('#updateModal').modal('hide');
+		};
+
+		$scope.updateoverwrite = function() {
+				List.get($routeParams.id, function(l) {
+										 $scope.list = l;
+								 });
+				$scope.updatable = false;
+				$('#updateModal').modal('hide');
+		};
 
 		$scope.sort = function(event, ui) {
 				var ids = $("#sortablelist").sortable("toArray");
@@ -99,7 +133,7 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 						$scope.list.Items = new Array();
 				}
 
-				$scope.list.Items.push({
+				$scope.list.Items.unshift({
 																	 "Name": $scope.newitem,
 																	 "Completed": false,
 																	 "Delete": false
@@ -125,19 +159,6 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				
 				$scope.dirty = true;
 				$('#cleanModal').modal('hide');
-		};
-
-		// Bring up a modal to verify deletion.
-		$scope.delete = function(key, event) {
-				$('#deleteModal').modal();
-		};
-
-		// Delete the list and go back to the lists view.
-		$scope.suredelete = function() {
-				List.delete($scope.list.Key);
-
-				$('#deleteModal').modal('hide');
-				$location.path("/");
 		};
 
 		// Save changes to the list and update the list.

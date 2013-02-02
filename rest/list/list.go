@@ -111,11 +111,15 @@ func (l *List) ConvertItems() {
 	}
 }
 
-// FindItem looks through this List's Items and returns a ListItem
-// matching the given name or nil if it was not found.
-func (l *List) FindItem(name string) *ListItem {
-	for _, li := range l.Items {
+// RemoveItem looks through this List's Items and returns a ListItem
+// matching the given name or nil if it was not found. If an item was
+// found, it is removed from the list.
+func (l *List) RemoveItem(name string) *ListItem {
+	for i, li := range l.Items {
 		if li.Name == name {
+			// Remove the item.
+			l.Items = append(l.Items[:i], l.Items[i+1:]...)
+
 			return &li
 		}
 	}
@@ -124,30 +128,33 @@ func (l *List) FindItem(name string) *ListItem {
 }
 
 // Merge combines modifies the ListItems in this List with the given
-// List. The list that was modified most recently is considered to be
-// the authority on what the order of the items are and the state of
-// the items. The only exception is that any ListItem with Delete set
-// to true will not be in the merged list.
+// List. The incoming list is considered to be the authority on the
+// order. The only exception is that any ListItem with Delete set to
+// true will not be in the merged list.
 func (l *List) Merge(m *List) {
-	var recv *List
-	var send *List
 	var nlst []ListItem
 
-	// The list with the most recent LastModified time should be
-	// considered the authority on the order of the list.
-	recv = l
-	send = m
-	if m.LastModified.After(l.LastModified) {
-		recv = m
-		send = l
-	}
-
-	for _, r := range recv.Items {
+	for _, r := range m.Items {
 		// Get the accompanying list item.
-		s := send.FindItem(r.Name)
+		s := l.RemoveItem(r.Name)
 
 		// If it is marked for deletion, we should skip this item.
 		if (s != nil && s.Delete) || r.Delete {
+			continue
+		}
+
+		// Save a new ListItem to the new []ListItem.
+		nlst = append(nlst, ListItem{
+			Name:      r.Name,
+			Completed: r.Completed,
+			Delete:    false,
+		})
+	}
+
+	// Add the remaining items from this list.
+	for _, r := range l.Items {
+		// If it is marked for deletion, we should skip this item.
+		if r.Delete {
 			continue
 		}
 

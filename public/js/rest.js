@@ -21,6 +21,17 @@ angular.module('rest', ['ngResource'])
 															 });
 								 };
 
+								 this.checkupdate = function(data, call) {
+										 return $http.get("/rest/list/" + data.Key + "/")
+												 .then(function (response) {
+																	 var sdate = Date.parseRFC3339(response.data.LastModified);
+																	 var mdate = Date.parseRFC3339(data.LastModified);
+
+																	 call(sdate > mdate);
+															 });
+										 
+								 };
+
 								 this.delete = function(key) {
 										 return $http.delete("/rest/list/" + key + "/")
 												 .then(function(response) {
