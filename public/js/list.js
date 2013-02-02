@@ -84,9 +84,9 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 																 $scope.save();
 														 }
 												 });
-				$scope.timer = $timeout($scope.checkupdate, 5000);
+				$scope.timer = $timeout($scope.checkupdate, 30000);
 		};
-		$scope.timer = $timeout($scope.checkupdate, 5000);
+		$scope.timer = $timeout($scope.checkupdate, 30000);
 
 		$scope.update = function() {
 				if ($scope.dirty) {
