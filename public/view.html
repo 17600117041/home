@@ -2,44 +2,52 @@
 	<div class="span6 offset3">
 		<h1>{{list.Name}}</h1>
 		<div class="clearfix">
-			<form class="form-search pull-left"> 
-				<input class="search-query pull-left" 
-							 type="text" data-ng-model="newitem">
-				<div class="pull-left">&nbsp;</div>
-				<button class="pull-left btn btn-primary" data-ng-click="add()">
-					<i class="icon-plus icon-white"></i>
-					Add
+			<div class="pad-bottom pull-right">
+				<button class="btn btn-warning" 
+								data-ng-click="clean()">
+					<i class="icon-trash icon-white"></i>
+					Clean
 				</button>
-			</form>
-			<button class="pull-right btn btn-success" 
-							data-ng-disabled="!dirty"
-							data-ng-click="save()">
-				<i class="icon-hdd icon-white"></i>
-				Save
-			</button>
-			<div class="pull-right">&nbsp;</div>
-			<button class="pull-right btn btn-danger" 
-							data-ng-click="delete()">
-				<i class="icon-remove icon-white"></i>
-				Delete
-			</button>
-			<div class="pull-right">&nbsp;</div>
-			<button class="pull-right btn btn-warning" 
-							data-ng-click="clean()">
-				<i class="icon-trash icon-white"></i>
-				Clean
-			</button>
+				<button class="btn btn-danger" 
+								data-ng-click="delete()">
+					<i class="icon-remove icon-white"></i>
+					Delete
+				</button>
+				<button class="btn btn-success" 
+								data-ng-disabled="!dirty"
+								data-ng-click="save()">
+					<i class="icon-hdd icon-white"></i>
+					Save
+				</button>
+			</div>
+			<div class="pad-bottom pull-left">
+				<form class="form-search"> 
+					<input class="search-query pull-left" 
+								 type="text" data-ng-model="newitem">
+					<button class="pull-left btn btn-primary" data-ng-click="add()">
+						<i class="icon-plus icon-white"></i>
+						Add
+					</button>
+				</form>
+			</div>
 		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="span6 offset3">
 		<div data-ng-show="list.Items.length > 0">
-		<ul class="unstyled list-striped" id="sortablelist">
-			<li id="list-item-{{$index}}" class="pointer-cursor" 
-					data-ng-repeat="item in list.Items | filter:noshow">
-				<label class="checkbox">
-					<input type="checkbox" data-ng-change="check(item)" 
-								 data-ng-model="item.Completed"> {{item.Name}}
-				</label>
-			</li>
-		</ul>
+			<ul class="unstyled list-striped" id="sortablelist">
+				<li id="list-item-{{$index}}"
+						data-ng-repeat="item in list.Items | filter:noshow">
+					<label class="checkbox">
+						<input type="checkbox" data-ng-change="check(item)" 
+									 data-ng-model="item.Completed"> {{item.Name}}
+						<div class="pull-right btn btn-info drag-icon">
+							<i class="all-scroll-cursor icon-align-justify icon-white"></i>
+						</div>
+					</label>
+				</li>
+			</ul>
 		</div>
 		<div data-ng-hide="list.Items.length > 0">
 			<ul class="unstyled list-striped">

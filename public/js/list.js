@@ -2,9 +2,18 @@
 angular.module('list', ['rest'])
 		.config(function ($routeProvider) {
 							 $routeProvider
-										.when('/', {controller:ListsCtrl, templateUrl: 'lists.html'})
-										.when('/new', {controller:CreateCtrl, templateUrl: 'new.html'})
-										.when('/view/:id', {controller:ViewCtrl, templateUrl: 'view.html'})
+										.when('/', {
+															controller:ListsCtrl, 
+															templateUrl: 'lists.html'
+													})
+										.when('/new', {
+															controller:CreateCtrl, 
+															templateUrl: 'new.html'
+													})
+										.when('/view/:id', {
+															controller:ViewCtrl, 
+															templateUrl: 'view.html'
+													})
 										.otherwise({redirectTo: '/'});
 					 }
 				
@@ -59,12 +68,17 @@ function CreateCtrl($scope, $location, List) {
 // CreateCtrl is the controller for viewing and updating lists.
 function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
-		// Force a save every 30 seconds if something has changed.
-		$timeout(function() {
-								 if ($scope.dirty) {
-										 $scope.save();
-								 }
-						 }, 30000);
+		$scope.$on('$destroy', function() {
+									 console.log("stopping timer");
+									 $timeout.cancel($scope.timer);
+							 });
+
+		// Force a save every 90 seconds if something has changed.
+		// $scope.refresh = function() {
+		// 		$scope.save();
+		// 		$scope.timer = $timeout($scope.refresh, 90000);
+		// };
+		// $scope.timer = $timeout($scope.refresh, 90000);
 
 		$scope.sort = function(event, ui) {
 				var ids = $("#sortablelist").sortable("toArray");
@@ -153,12 +167,11 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 								 // Make the list sortable.
 								 $("#sortablelist")
 										 .sortable({
+																	 handle: '.drag-icon',
 																	 stop: function() {
 																			 $scope.$apply($scope.sort());
 																	 }
 															 });
-
-
 						 });
 
 }
