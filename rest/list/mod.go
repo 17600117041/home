@@ -76,26 +76,21 @@ func PutList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Merge the old list with the new list.
-	nl.Merge(&ol)
-
-	// The key can't change, so keep the original.
-	nl.Key = ol.Key
+	// Merge the new list into the old list.
+	ol.Merge(&nl)
 
 	// Set the last modified time.
-	nl.LastModified = time.Now()
-
-	gorca.Log(r, "debug", "new list: %v", nl)
+	ol.LastModified = time.Now()
 
 	// Save the changed list.
-	nl.ConvertItems()
-	if _, err := datastore.Put(c, k, &nl); err != nil {
+	ol.ConvertItems()
+	if _, err := datastore.Put(c, k, &ol); err != nil {
 		gorca.LogAndUnexpected(w, r, err)
 		return
 	}
 
 	// Return the updated list back.
-	gorca.WriteJSON(w, r, nl)
+	gorca.WriteJSON(w, r, ol)
 }
 
 // DeleteList deletes the list for the given tag. The currently
