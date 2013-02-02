@@ -1,0 +1,26 @@
+body {
+		padding-top: 60px;
+}
+
+.pointer-cursor {
+		cursor: pointer;
+}
+
+.done-true {
+		text-decoration: line-through;
+		color: grey;
+}
+
+.list-striped {
+
+}
+
+.list-striped > li {
+		line-height: 20px;
+		padding: 8px;
+		border-top: 1px solid #dddddd;
+}
+
+.list-striped li:nth-child(odd) {
+		background-color: #f9f9f9;
+}

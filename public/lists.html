@@ -1,0 +1,36 @@
+<div class="row">
+	<div class="span6 offset3">
+		<h1>Lists</h1>
+		<table class="table table-striped table-hover">
+			<tbody>
+				<tr data-ng-repeat="list in lists">
+					<td data-ng-click="view(list.Key)" class="pointer-cursor">
+						<div class="pull-left"><a href="#/view/{{list.Key}}">{{list.Name}}</a></div>
+						<div class="pull-right">
+							<button class="btn btn-danger pull-right" data-ng-click="delete(list.Key, $event)">
+								<i class="icon-remove icon-white"></i>
+								Delete
+							</button>
+						</div>
+					</td>
+				</tr>
+				<tr data-ng-show="lists.length == 0">
+					<td colspan="3">There are no lists.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="deleteModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Are You Sure?</h3>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete this list?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+    <button class="btn btn-danger" data-ng-click="sure()">Yes</button>
+  </div>
+</div>
