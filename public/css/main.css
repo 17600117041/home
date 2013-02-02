@@ -2,6 +2,10 @@ body {
 		padding-top: 60px;
 }
 
+.all-scroll-cursor {
+		cursor: all-scroll;
+}
+
 .pointer-cursor {
 		cursor: pointer;
 }
@@ -23,4 +27,8 @@ body {
 
 .list-striped li:nth-child(odd) {
 		background-color: #f9f9f9;
+}
+
+.pad-bottom {
+		padding-bottom: 15px;
 }
