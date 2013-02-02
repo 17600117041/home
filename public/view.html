@@ -42,7 +42,7 @@
 						data-ng-repeat="item in list.Items | filter:noshow">
 					<label class="checkbox">
 						<input type="checkbox" data-ng-change="check(item)" 
-									 data-ng-model="item.Completed"> {{item.Name}}
+									 data-ng-model="item.Completed"> <span class="done-{{item.Completed}}">{{item.Name}}</span>
 						<div class="pull-right btn btn-info drag-icon">
 							<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 						</div>
