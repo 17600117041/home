@@ -1,9 +1,14 @@
 <!doctype html>
 <html lang="en" data-ng-app="list">
 	<head>
+		<!--
+				Copyright 2013 Joshua Marsh. All rights reserved.
+				Use of this source code is governed by a BSD-style
+				license that can be found in the LICENSE file.
+			-->
 		<meta charset="utf-8">
 		<title>List App</title>
-		<meta name="description" content="The Marsh Family List App">
+		<meta name="description" content="List App">
 		<meta name="author" content="Joshua Marsh">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" href="favicon.ico" />
@@ -16,20 +21,20 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
 
-		<!-- Twitter Bootstrap -->
+		<!-- Twitter Bootstrap CSS -->
 		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap.min.css" 
 					rel="stylesheet">
 
-		<!-- Our stylesheets -->
-		<link href="/css/boot.css" rel="stylesheet">
+		<!-- Our stylesheets. We do it before bootstrap to get the body changes in first. -->
+		<link href="/css/main.css" rel="stylesheet">
 
-		<!-- Bootstrap responsive -->
+		<!-- Twitter Bootstrap Responsive CSS -->
 		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-responsive.min.css" 
 					rel="stylesheet">
 
-		<!-- Our stylesheets -->
-		<link href="/css/main.css" rel="stylesheet">
-
+		<!-- Twitter Bootstrap JavaScipt -->
+		<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+		
 		<!-- AngularJS -->
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular-resource.min.js"></script>
@@ -42,7 +47,6 @@
 		<script src="/js/view.js"></script>
 		<script src="/js/date.js"></script>
 		<script src="/js/touch-punch.min.js"></script>
-
 	</head>
 	<body>
 		<div class="container">
@@ -78,11 +82,9 @@
 				</div>
 			</div>
 
+			<!-- The main content of the page. -->
 			<div data-ng-view></div>
 		</div>
-		
-		<!-- Twitter Bootstrap -->
-		<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
 		
 	</body>
 </html>

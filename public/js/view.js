@@ -1,3 +1,9 @@
+/*
+	Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
+	source code is governed by a BSD-style license that can be found in
+	the LICENSE file.
+*/
+
 // ViewCtrl is the controller for viewing and updating lists.
 function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
@@ -21,11 +27,14 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 		};
 		$scope.timer = $timeout($scope.checkupdate, 30000);
 
+		// This is called when the update button is pressed.
 		$scope.update = function() {
 				if ($scope.dirty) {
-						// Ask them if they want to merge their changes.
+						// Ask them if they want to merge their changes 
+						// if there are changes.
 						$('#updateModal').modal();
 				} else {
+						// Otherwise, we can just update.
 						List.get($routeParams.id, function(l) {
 												 $scope.list = l;
 										 });
@@ -33,12 +42,16 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				}
 		};
 
+		// This is called when they want to merge their changes with 
+		// the latest list.
 		$scope.updatemerge = function() {
 				$scope.save();	
 				$scope.updatable = false;
 				$('#updateModal').modal('hide');
 		};
 
+		// This is called when they want to just get the updated list 
+		// and lose their changes.
 		$scope.updateoverwrite = function() {
 				List.get($routeParams.id, function(l) {
 										 $scope.list = l;
@@ -47,15 +60,20 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				$('#updateModal').modal('hide');
 		};
 
+		// When the order of the list items change, this is called to 
+		// update the internal array that is storing the list items.
 		$scope.sort = function(event, ui) {
 				var ids = $("#sortablelist").sortable("toArray");
 				var items = new Array();
+
+				// Make a new list from the array.
 				ids.forEach(function(e, i, a) {
 												var eid = e.replace("list-item-", "");
 												var id = parseInt(eid);
 												items.push($scope.list.Items[id]);
 										});
-				
+
+				// Set the list ot be the newly made list.				
 				$scope.list.Items = items;
 				$scope.dirty = true;
 		};
@@ -66,6 +84,7 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 						$scope.list.Items = new Array();
 				}
 
+				// We unshift to add it to the top.
 				$scope.list.Items.unshift({
 																	 "Name": $scope.newitem,
 																	 "Completed": false,
@@ -115,11 +134,17 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				return !item.Delete;
 		};
 		
+		// Stop propogating a click. This is mainly used by the list
+		// item input text boxes so they don't change the completed 
+		// state of the item when they are clicked.
 		$scope.noclick = function(event) {
 				// Don't let it fall through to the view.
 				event.stopPropagation();
 		};
 
+		// This changes the state of the item being edited. There 
+		// are two special values: -1 is for no item, and -2 is the 
+		// title of the list.
 		$scope.edit = function(id, event) {
 				$scope.editing = id;
 				$scope.dirty = true;
@@ -143,6 +168,9 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 															 });
 						 });
 
+		// Start out with cursor in the add text box.
 		$('#newitem').focus();
+
+		// We start out not editing any list.
 		$scope.editing = -1;
 }

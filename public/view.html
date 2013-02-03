@@ -1,13 +1,20 @@
+<!--
+		Copyright 2013 Joshua Marsh. All rights reserved.
+		Use of this source code is governed by a BSD-style
+		license that can be found in the LICENSE file.
+	-->
 <div class="row">
 	<div class="span6 offset3">
 		<h1 class="pointer-cursor"
 				data-ng-click="edit(-2, $event)" data-ng-hide="editing == -2">{{list.Name}}</h1>
+		<!-- This is the edit field that will show up when the name is clicked. -->
 		<input data-ng-click="noclick($event)" 
 					 data-ng-hasfocus="editing == -2"
 					 class="editing-item" data-ng-show="editing == -2"
 					 type="text" data-ng-model="list.Name">
 
 		<div class="clearfix">
+			<!-- The table header with buttons. -->
 			<div class="pad-bottom pull-right">
 				<button class="btn btn-warning" 
 								data-ng-click="clean()">
@@ -62,6 +69,8 @@
 									 class="pull-left"
 									 data-ng-model="item.Completed">
 						<div class="pull-left done-{{item.Completed}}">
+							<!-- This is the text box that will show up when the
+							item is clicked. -->
 							<input data-ng-click="noclick($event)" 
 										 id="editing-item-{{$index}}"
 										 data-ng-hasfocus="editing == $index"
@@ -89,6 +98,8 @@
 	</div>
 </div>
 
+<!-- This is the popup box that shows when the update button is
+clicked but there local changes. -->
 <div id="updateModal" class="modal hide">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -115,6 +126,7 @@
   </div>
 </div>
 
+<!-- This is the popup box that shows when the clean button is clicked. -->
 <div id="cleanModal" class="modal hide">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
