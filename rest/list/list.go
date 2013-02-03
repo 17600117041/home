@@ -2,11 +2,9 @@
 package list
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/icub3d/gorca"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -46,8 +44,15 @@ func MakeMuxer(prefix string) http.Handler {
 	return m
 }
 
-// ListItem is a single item in a List. 
-type ListItem struct {
+// Item is a single item in a List. 
+type Item struct {
+	// A URL safe version of the datastores key for this list item.
+	Key string
+
+	// The order of this item within the list. Lower numbers come before
+	// higher numbers.
+	Order int
+
 	// The string representing the list item.
 	Name string
 
@@ -56,8 +61,35 @@ type ListItem struct {
 
 	// If delete is true, when this item is merged with other items,
 	// this item will be removed from the merged list. See
-	// MergeListItems for more information.
+	// Merge for more information.
 	Delete bool
+}
+
+// ItemsList is a list of Items that have the methods necessary to
+// be sorted.
+type ItemsList []*Item
+
+// Len returns the length of this ItemsList.
+func (li ItemsList) Len() int {
+	return len(li)
+}
+
+// Less returns true if the Order of li[i] < li[j].
+func (li ItemsList) Less(i, j int) bool {
+	return li[i].Order < li[j].Order
+}
+
+// Swap switches the values of li[i] and li[j].
+func (li ItemsList) Swap(i, j int) {
+	li[i], li[j] = li[j], li[i]
+}
+
+// SetOrders fixes the order of the items by setting each Items order
+// to its current position in the array.
+func (li ItemsList) SetOrders() {
+	for k, r := range li {
+		r.Order = k
+	}
 }
 
 // List is the structure used to save, get, and delete lists from the
@@ -66,85 +98,64 @@ type List struct {
 	// The name of the list.
 	Name string
 
-	// A URL safe version of the datastores key for this list item. It
+	// A URL safe version of the datastores key for this list. It
 	// is not stored in the datastore.
 	Key string
 
 	// This is the time the list was last modified.
 	LastModified time.Time
 
-	// The items in the list. This is used by the application.
-	Items []ListItem `datastore:"-"`
-
-	// This is the string representation for the list of items. The
-	// datastore won't save lists of structs, so we convert it on the
-	// fly and it's saved here.
-	Sitems []string `json:"-"`
+	// The items in the list. This is used by the web application. The
+	// datastore functions will retrieve these values for us.
+	Items ItemsList `datastore:"-"`
 }
 
-// ConvertSitems takes the Sitems and translates them into Items and
-// replaces the current Items with the translated values.
-func (l *List) ConvertSitems() {
-	l.Items = make([]ListItem, 0, len(l.Sitems))
-	for _, s := range l.Sitems {
-		parts := strings.SplitN(s, "|", 2)
-
-		completed := false
-		if parts[0] == "true" {
-			completed = true
-		}
-
-		l.Items = append(l.Items, ListItem{
-			Name:      parts[1],
-			Completed: completed,
-		})
-	}
-}
-
-// ConvertItems translates the Items list into their string
-// representation and saves them to Sitems.
-func (l *List) ConvertItems() {
-	l.Sitems = make([]string, 0, len(l.Items))
-	for _, i := range l.Items {
-		l.Sitems = append(l.Sitems,
-			fmt.Sprintf("%v|%s", i.Completed, i.Name))
-	}
-}
-
-// RemoveItem looks through this List's Items and returns a ListItem
-// matching the given name or nil if it was not found. If an item was
+// RemoveItem looks through this List's Items and returns an Item
+// matching the given key or nil if it was not found. If an item was
 // found, it is removed from the list.
-func (l *List) RemoveItem(name string) *ListItem {
+func (l *List) RemoveItem(key string) *Item {
 	for i, li := range l.Items {
-		if li.Name == name {
+		if li.Key == key {
 			// Remove the item.
 			l.Items = append(l.Items[:i], l.Items[i+1:]...)
 
-			return &li
+			return li
 		}
 	}
 
 	return nil
 }
 
-// Merge combines modifies the ListItems in this List with the given
-// List. The incoming list is considered to be the authority on the
-// order. The only exception is that any ListItem with Delete set to
-// true will not be in the merged list.
-func (l *List) Merge(m *List) {
-	var nlst []ListItem
+// Merge combines the Items in this List with the given List. This
+// list items are then sorted by their order and given a new order
+// based on the sorting. The list name is also changed. A list of keys
+// is returned of items that should be deleted from the datastore.
+func (l *List) Merge(m *List) []string {
+	nlst := ItemsList{}
+
+	del := []string{}
+
+	l.Name = m.Name
 
 	for _, r := range m.Items {
 		// Get the accompanying list item.
-		s := l.RemoveItem(r.Name)
+		s := l.RemoveItem(r.Key)
 
 		// If it is marked for deletion, we should skip this item.
-		if (s != nil && s.Delete) || r.Delete {
+		if s != nil && s.Delete {
+			del = append(del, s.Key)
 			continue
 		}
 
-		// Save a new ListItem to the new []ListItem.
-		nlst = append(nlst, ListItem{
+		if r.Delete {
+			del = append(del, r.Key)
+			continue
+		}
+
+		// Save a new ListItem to the new list.
+		nlst = append(nlst, &Item{
+			Key:       r.Key,
+			Order:     r.Order,
 			Name:      r.Name,
 			Completed: r.Completed,
 			Delete:    false,
@@ -155,16 +166,24 @@ func (l *List) Merge(m *List) {
 	for _, r := range l.Items {
 		// If it is marked for deletion, we should skip this item.
 		if r.Delete {
+			del = append(del, r.Key)
 			continue
 		}
 
-		// Save a new ListItem to the new []ListItem.
-		nlst = append(nlst, ListItem{
+		nlst = append(nlst, &Item{
+			Key:       r.Key,
+			Order:     r.Order,
 			Name:      r.Name,
 			Completed: r.Completed,
 			Delete:    false,
 		})
 	}
 
+	// sort the list.
+	nlst.SetOrders()
+
+	// Set the list to our newly merged sorted list.
 	l.Items = nlst
+
+	return del
 }

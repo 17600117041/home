@@ -9,8 +9,7 @@ angular.module('rest', ['ngResource'])
 								 this.create = function(data, call) {
 										 return $http.post("/rest/list/", data)
 												 .then(function (response) {
-																	 data.Key = response.data.Key;
-																	 call(data);
+																	 call(response.data);
 															 });
 								 };
 
@@ -32,10 +31,10 @@ angular.module('rest', ['ngResource'])
 										 
 								 };
 
-								 this.delete = function(key) {
+								 this.delete = function(key, call) {
 										 return $http.delete("/rest/list/" + key + "/")
 												 .then(function(response) {
-																	 return response.data;
+																	 call(response.data);
 															 });
 								 };
 								 

@@ -14,17 +14,11 @@ func GetAllLists(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	q := datastore.NewQuery("List").Order("-LastModified")
 
-	// Fetch the lists. We only want subset of the data, so we make a
-	// struct with the fields we want.
+	// Fetch the lists. 
 	lists := []List{}
 	if _, err := q.GetAll(c, &lists); err != nil {
 		gorca.LogAndUnexpected(w, r, err)
 		return
-	}
-
-	for _, list := range lists {
-		list.Items = nil
-		list.Sitems = nil
 	}
 
 	// Write the lists as JSON.
@@ -35,29 +29,50 @@ func GetAllLists(w http.ResponseWriter, r *http.Request) {
 // logged in user must own the list or the list must have been shared
 // with the user. Otherwise, an unauthorized error is returned.
 func GetList(w http.ResponseWriter, r *http.Request) {
-	// Get the context.
-	c := appengine.NewContext(r)
-
 	// Get the Key.
 	vars := mux.Vars(r)
 	key := vars["key"]
+
+	l, _, ok := getListHelper(w, r, key)
+	if !ok {
+		return
+	}
+
+	// Write the lists as JSON.
+	gorca.WriteJSON(w, r, l)
+}
+
+// getListHelper is a helper function that retrieves a list and it's
+// items from the datastore. If a failure occured, false is returned
+// and a response was returned to the request. This case should be
+// terminal.
+func getListHelper(w http.ResponseWriter, r *http.Request, key string) (*List, *datastore.Key, bool) {
+	// Get the context.
+	c := appengine.NewContext(r)
 
 	// Decode the string version of the key.
 	k, err := datastore.DecodeKey(key)
 	if err != nil {
 		gorca.LogAndUnexpected(w, r, err)
-		return
+		return nil, nil, false
 	}
 
 	// Get the list by key.
 	var l List
 	if err := datastore.Get(c, k, &l); err != nil {
 		gorca.LogAndNotFound(w, r, err)
-		return
+		return nil, nil, false
 	}
 
-	l.ConvertSitems()
+	// Get all of the items for the list.
+	var li ItemsList
+	q := datastore.NewQuery("Item").Ancestor(k).Order("Order")
+	if _, err := q.GetAll(c, &li); err != nil {
+		gorca.LogAndUnexpected(w, r, err)
+		return nil, nil, false
+	}
 
-	// Write the lists as JSON.
-	gorca.WriteJSON(w, r, l)
+	l.Items = li
+
+	return &l, k, true
 }
