@@ -1,71 +1,4 @@
-// This is the routing mechanism.
-angular.module('list', ['rest'])
-		.config(function ($routeProvider) {
-							 $routeProvider
-										.when('/', {
-															controller:ListsCtrl, 
-															templateUrl: 'lists.html'
-													})
-										.when('/new', {
-															controller:CreateCtrl, 
-															templateUrl: 'new.html'
-													})
-										.when('/view/:id', {
-															controller:ViewCtrl, 
-															templateUrl: 'view.html'
-													})
-										.otherwise({redirectTo: '/'});
-					 }
-				
-		);
-
-// UserCtrl is the controller for part of the site that lists all of
-// the lists.
-function UserCtrl($scope, User) {
-		$scope.user = User.get();
-}
-
-// ListsCtrl is the controller for viewing all lists.
-function ListsCtrl($scope, $location, List) {
-		List.getall(function (lists) {
-										$scope.lists = lists;
-								});
-
-		$scope.view = function(key) {
-				$location.path('/view/' + key);
-		};
-
-		$scope.delete = function(key, event) {
-				$scope.deleteKey = key;
-
-				$('#deleteModal').modal();
-
-				// Don't let it fall through to the view.
-				event.stopPropagation();
-		};
-
-		$scope.sure = function() {
-				List.delete($scope.deleteKey);
-				$scope.lists = List.getall();
-
-				$('#deleteModal').modal('hide');
-		};
-}
-
-// CreateCtrl is the controller for making new lists.
-function CreateCtrl($scope, $location, List) {
-		$scope.back = function() {
-			history.back();	
-		};
-
-		$scope.save = function() {
-				List.create({"Name": $scope.name}, function (l) {
-											 $location.path('/view/' + l.Key);
-									 });
-		};
-}
-
-// CreateCtrl is the controller for viewing and updating lists.
+// ViewCtrl is the controller for viewing and updating lists.
 function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
 		// Cancel the update checks when we leave.
@@ -172,6 +105,7 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 		// A helper function that marks the list dirty when an item is
 		// checked.
 		$scope.check = function(item) {
+				item.Completed = !item.Completed;
 				$scope.dirty = true;
 		};
 
@@ -181,6 +115,20 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				return !item.Delete;
 		};
 		
+		$scope.noclick = function(event) {
+				// Don't let it fall through to the view.
+				event.stopPropagation();
+		};
+
+		$scope.edit = function(id, event) {
+				$scope.editing = id;
+				$scope.dirty = true;
+				// Don't let it fall through to the view.
+				if (event != undefined) {
+						event.stopPropagation();		
+				}
+		};
+
 		// Get the list items.
 		List.get($routeParams.id, function(l) {
 								 $scope.list = l;
@@ -195,4 +143,6 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 															 });
 						 });
 
+		$('#newitem').focus();
+		$scope.editing = -1;
 }
