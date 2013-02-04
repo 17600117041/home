@@ -6,47 +6,8 @@
 package list
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/icub3d/gorca"
-	"net/http"
 	"time"
 )
-
-// MakeMuxer creates a http.Handler to manage all list operations. If
-// a prefix is given, that prefix will be the first part of the
-// url. This muxer will provide the following handlers and return a
-// RESTful 404 on all others.
-//
-//  GET     prefix + /        Get all lists.
-//  POST    prefix + /        Create a new list.
-//
-//  GET     prefix + /{key}/  Get the list for the given key.
-//  PUT     prefix + /{key}/  Update the list with the given key.
-//  DELETE  prefix + /{key}/  Delete the list with the given key.
-//
-// See the functions related to these urls for more details on what
-// each one does and the requirements behind it.
-func MakeMuxer(prefix string) http.Handler {
-	var m *mux.Router
-
-	// Pass through the prefix if we got one.
-	if prefix == "" {
-		m = mux.NewRouter()
-	} else {
-		m = mux.NewRouter().PathPrefix(prefix).Subrouter()
-	}
-
-	m.HandleFunc("/", GetAllLists).Methods("GET")
-	m.HandleFunc("/", PostList).Methods("POST")
-
-	m.HandleFunc("/{key}/", GetList).Methods("GET")
-	m.HandleFunc("/{key}/", PutList).Methods("PUT")
-	m.HandleFunc("/{key}/", DeleteList).Methods("DELETE")
-
-	m.HandleFunc("/{path:.*}", gorca.NotFoundFunc)
-
-	return m
-}
 
 // Item is a single item in a List. 
 type Item struct {
@@ -69,24 +30,9 @@ type Item struct {
 	Delete bool
 }
 
-// ItemsList is a list of Items that have the methods necessary to
-// be sorted.
+// ItemsList is a list of Items that has the ability reset the orders
+// of it's itms based on the current position in the array.
 type ItemsList []*Item
-
-// Len returns the length of this ItemsList.
-func (li ItemsList) Len() int {
-	return len(li)
-}
-
-// Less returns true if the Order of li[i] < li[j].
-func (li ItemsList) Less(i, j int) bool {
-	return li[i].Order < li[j].Order
-}
-
-// Swap switches the values of li[i] and li[j].
-func (li ItemsList) Swap(i, j int) {
-	li[i], li[j] = li[j], li[i]
-}
 
 // SetOrders fixes the order of the items by setting each Items order
 // to its current position in the array.
@@ -109,8 +55,10 @@ type List struct {
 	// This is the time the list was last modified.
 	LastModified time.Time
 
-	// The items in the list. This is used by the web application. The
-	// datastore functions will retrieve these values for us.
+	// The items in the list. This is used by the web
+	// application. Within the datastore, these are children of the
+	// list. The get, put, etc. functions will manage this automagically
+	// if you use them.
 	Items ItemsList `datastore:"-"`
 }
 
@@ -130,16 +78,17 @@ func (l *List) RemoveItem(key string) *Item {
 	return nil
 }
 
-// Merge combines the Items in this List with the given List. This
-// list items are then sorted by their order and given a new order
-// based on the sorting. The list name is also changed. A list of keys
-// is returned of items that should be deleted from the datastore.
+// Merge combines the Items in this List with the given List. The
+// given list is considered the authority on the order of list
+// items. The items are then given a new order based on their position
+// in the array. A list of keys is returned of items that were removed.
 func (l *List) Merge(m *List) []string {
+	// This is the new list.
 	nlst := ItemsList{}
 
+	// This is the items marked for deletion. They'll need to be removed
+	// from the datastore for the deletes to persist.
 	del := []string{}
-
-	l.Name = m.Name
 
 	for _, r := range m.Items {
 		// Get the accompanying list item.
@@ -156,7 +105,7 @@ func (l *List) Merge(m *List) []string {
 			continue
 		}
 
-		// Save a new ListItem to the new list.
+		// Save a new Item to the new list.
 		nlst = append(nlst, &Item{
 			Key:       r.Key,
 			Order:     r.Order,
@@ -174,6 +123,7 @@ func (l *List) Merge(m *List) []string {
 			continue
 		}
 
+		// Add the item.
 		nlst = append(nlst, &Item{
 			Key:       r.Key,
 			Order:     r.Order,
@@ -183,7 +133,7 @@ func (l *List) Merge(m *List) []string {
 		})
 	}
 
-	// sort the list.
+	// Set the list order.
 	nlst.SetOrders()
 
 	// Set the list to our newly merged sorted list.

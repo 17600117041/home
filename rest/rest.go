@@ -16,8 +16,10 @@ import (
 func init() {
 	// Manage the user 
 	http.Handle("/rest/user/", user.MakeMuxer("/rest/user/"))
+
+	// Manage the lists
 	http.Handle("/rest/list/", list.MakeMuxer("/rest/list/"))
 
+	// Everything else should return a 404 and JSON error.
 	http.HandleFunc("/", gorca.NotFoundFunc)
-
 }

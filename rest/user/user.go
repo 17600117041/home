@@ -7,6 +7,7 @@
 package user
 
 import (
+	"appengine"
 	"github.com/gorilla/mux"
 	"github.com/icub3d/gorca"
 	"net/http"
@@ -28,8 +29,10 @@ func MakeMuxer(prefix string) http.Handler {
 		m = mux.NewRouter().PathPrefix(prefix).Subrouter()
 	}
 
+	// Add the handler for GET /.
 	m.HandleFunc("/", GetUser).Methods("GET")
 
+	// Everything else should 404.
 	m.HandleFunc("/{path:.*}", gorca.NotFoundFunc)
 
 	return m
@@ -46,24 +49,24 @@ type UserInfo struct {
 
 // GetUser sends a JSON response with the current user information.
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	// Get the context.
+	c := appengine.NewContext(r)
+
 	// Get the current user.
-	u, ok := gorca.GetUserOrUnexpected(w, r)
+	u, ok := gorca.GetUserOrUnexpected(c, w, r)
 	if !ok {
 		return
 	}
 
 	// Get their logout URL.
-	logout, ok := gorca.GetUserLogoutURL(w, r, "/")
+	logout, ok := gorca.GetUserLogoutURL(c, w, r, "/")
 	if !ok {
 		return
 	}
 
-	// Make the user struct we'll return.
-	userInfo := UserInfo{
+	// Write the user information out.
+	gorca.WriteJSON(c, w, r, UserInfo{
 		Email:     u.Email,
 		LogoutURL: logout,
-	}
-
-	// Write the user information out.
-	gorca.WriteJSON(w, r, userInfo)
+	})
 }
