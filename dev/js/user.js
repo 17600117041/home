@@ -11,4 +11,4 @@ function UserCtrl($scope, User) {
 								 $scope.user = data;
 						 });
 }
-UserCtrl.$inject['$scope', 'User'];
+UserCtrl.$inject = ['$scope', 'User'];

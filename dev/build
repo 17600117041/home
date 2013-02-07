@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Delete any files in prod
+if [ -d "prod" ]; then
+		rm -rf "prod"
+fi
+
+# Make the prod diretory if it doesn't exist.
+[ ! -d "prod" ] &&  mkdir prod
+
+# Use the closure tool to build all.min.js
+closure \
+		`find public -name "*.js" | xargs -n1 echo -n ' --js'` \
+		--compilation_level SIMPLE_OPTIMIZATIONS \
+		--warning_level QUIET \
+		--js_output_file prod/all.js
+
+# Use yuicompressor to minify css.
+find public -name "*.css" | xargs cat | \
+		yuicompressor \
+		--type css >prod/all.css
+
+# Write out the view files as templates within the HTML page.
+css=false
+css_out=false
+js=false
+js_out=false
+cat public/index.html | while read LINE; do
+		case "$LINE" in
+				*\<!--\ APP\ CSS\ --\>*)
+						if ! $css_out; then
+								echo -n '<link rel="stylesheet" href="/all.min.css">'
+								css_out=true
+						fi
+						if $css; then css=false; else css=true; fi
+						;;
+				*\<!--\ APP\ JS\ --\>*)
+						if ! $js_out; then
+								echo -n '<script src="/all.min.js"></script>'
+								js_out=true
+						fi
+						if $js; then js=false; else js=true; fi
+						;;
+				*\<!--\ EMBED\ HERE\ --\>*)
+						for FILE in `find public -name "*.html" -not -name "index.html"`; do
+								echo -n "<script type=\"text/ng-template\" id=\"$FILE\">"
+								htmlcompressor $FILE
+								echo -n "</script>"
+						done 
+						;;
+				
+				*) 
+						if $js; then continue; fi
+						if $css; then continue; fi
+						echo "$LINE"
+						;;
+		esac
+done | htmlcompressor > prod/index.html
+
+# Save favicon if it exists.
+[ -f "public/favicon.ico" ] &&  cp -af public/favicon.ico prod
+
+# We need to copy the img dir over.
+[ -d "public/img" ] && cp -af public/img prod/img
