@@ -1,5 +1,0 @@
-#!/bin/bash
-
-IPADDR=`ip addr  |  grep -o "10\.84\.7\.[0-9]*" | head -n1`
-
-$APPENGINE_SDK/dev_appserver.py --use_sqlite --high_replication -a $IPADDR $@

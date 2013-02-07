@@ -1,4 +1,0 @@
-#!/bin/bash
-
-[ -h app.yaml ] && unlink app.yaml
-ln -s prod.yaml app.yaml
