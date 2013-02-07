@@ -1,8 +1,8 @@
 /*
-	Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
-	source code is governed by a BSD-style license that can be found in
-	the LICENSE file.
-*/
+ Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
+ source code is governed by a BSD-style license that can be found in
+ the LICENSE file.
+ */
 
 // ListsCtrl is the controller for viewing all lists.
 function ListsCtrl($scope, $location, List) {
@@ -19,7 +19,7 @@ function ListsCtrl($scope, $location, List) {
 				$scope.copyName = "Copy of " + name;
 
 				$('#copyModal').modal();
-
+				
 				// Don't let it fall through to the view.
 				event.stopPropagation();
 		};
@@ -27,36 +27,36 @@ function ListsCtrl($scope, $location, List) {
 		// This function actually makes the copy of the list.
 		$scope.copy = function() {
 				$('#copyModal').modal('hide');
-
+				
 				List.get($scope.copyKey, function(l) {
-										 l.Name = $scope.copyName;
-										 List.create(l, function(nl) {
-																	 $location.path('/view/' + nl.Key + '/');
-															 });
-								 });
-
+						l.Name = $scope.copyName;
+						List.create(l, function(nl) {
+								$location.path('/view/' + nl.Key + '/');
+						});
+				});
+				
 		};
-
+		
 		// This function opens up the modal to verify that 
 		// they want to delete the list.
 		$scope.del = function(index, key, event) {
 				$scope.delIndex = index;
 				$scope.delKey = key;
-
+				
 				$('#deleteModal').modal();
 
 				// Don't let it fall through to the view.
 				event.stopPropagation();
 		};
-
+		
 		// This function performs the actual delete.
 		$scope.sure = function() {
 				$('#deleteModal').modal('hide');
 				List.del($scope.delKey, function() {
-										 $scope.lists.splice($scope.delIndex, 1);
-								 });
+						$scope.lists.splice($scope.delIndex, 1);
+				});
 		};
-
+		
 		// This function opens up the new modal box.
 		$scope.create = function() {
 				$('#newModal').modal();
@@ -74,14 +74,14 @@ function ListsCtrl($scope, $location, List) {
 		$scope.save = function() {
 				$('#newModal').modal('hide');
 				List.create({"Name": $scope.name}, function (l) {
-											 $location.path('/view/' + l.Key + '/');
-									 });
+						$location.path('/view/' + l.Key + '/');
+				});
 		};
 
 		// To start off, we should get all the lists.
 		List.getall(function (lists) {
-										$scope.lists = lists;
-								});
+				$scope.lists = lists;
+		});
 
 }
 ListsCtrl.$inject = ['$scope', '$location', 'List'];
