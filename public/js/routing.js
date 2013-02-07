@@ -6,23 +6,25 @@
 
 // This is the routing mechanism.
 angular.module('list', ['rest'])
-		.config(function ($routeProvider) {
-							 $routeProvider
-										.when('/', {
-															controller:ListsCtrl, 
-															templateUrl: 'lists.html'
-													})
-										.when('/view/:id', {
-															controller:ViewCtrl, 
-															templateUrl: 'view.html'
-													})
-										.otherwise({redirectTo: '/'});
-					 }
-				
-		)
+		.config(['$routeProvider', 
+						 function ($routeProvider) {
+								 $routeProvider
+										 .when('/', {
+															 controller:ListsCtrl, 
+															 templateUrl: 'lists.html'
+													 })
+										 .when('/view/:id', {
+															 controller:ViewCtrl, 
+															 templateUrl: 'view.html'
+													 })
+										 .otherwise({redirectTo: '/'});
+						 }
+						 
+						])
     // This is used to auto-focus the items then they are switched
     // from a span to a text box. 
-		.directive('ngHasfocus', function() {
+		.directive('ngHasfocus', 
+							 function() {
 									 return function(scope, element, attrs) {
 											 scope.$watch(attrs.ngHasfocus, function (nVal, oVal) {
 																				if (nVal) {
@@ -40,7 +42,7 @@ angular.module('list', ['rest'])
 																				if (e.which == 13) {
 																						scope.$apply("edit(-1);");
 																				}
-
+																				
 																		});
 									 };
 							 });

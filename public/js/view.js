@@ -172,3 +172,4 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 		// We start out not editing any list.
 		$scope.editing = -1;
 }
+ViewCtrl.$inject = ['$scope', '$location', '$routeParams', '$timeout', 'List'];

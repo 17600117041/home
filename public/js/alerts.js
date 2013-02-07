@@ -17,3 +17,4 @@ function AlertsCtrl($scope, Alerts) {
 				Alerts.remove(index);
 		};
 }
+AlertsCtrl.$inject = ['$scope', 'Alerts'];

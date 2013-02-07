@@ -17,37 +17,26 @@
 				<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 				<![endif]-->
 
-		<!-- jQuery -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
-
-		<!-- Twitter Bootstrap CSS -->
 		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap.min.css" 
 					rel="stylesheet">
-
-		<!-- Our stylesheets. We do it before bootstrap to get the body changes in first. -->
 		<link href="/css/main.css" rel="stylesheet">
-
-		<!-- Twitter Bootstrap Responsive CSS -->
 		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-responsive.min.css" 
 					rel="stylesheet">
 
-		<!-- Twitter Bootstrap JavaScipt -->
-		<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
-		
-		<!-- AngularJS -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular-resource.min.js"></script>
-
-		<!-- Our code -->
 		<script src="/js/rest.js"></script>
 		<script src="/js/routing.js"></script>
 		<script src="/js/alerts.js"></script>
 		<script src="/js/user.js"></script>
 		<script src="/js/lists.js"></script>
 		<script src="/js/view.js"></script>
-		<script src="/js/date.js"></script>
-		<script src="/js/touch-punch.min.js"></script>
+
+		<!-- we can async these because they aren't required on initial load. -->
+		<script async src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<script async src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+		<script async src="/js/date.js"></script>
+		<script async src="/js/touch-punch.min.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -101,6 +90,8 @@
 			<!-- The main content of the page. -->
 			<div data-ng-view></div>
 		</div>
-		
+
+		<!-- EMBED HERE -->
+
 	</body>
 </html>
