@@ -12,22 +12,22 @@ import (
 // Item is a single item in a List. 
 type Item struct {
 	// A URL safe version of the datastores key for this list item.
-	Key string
+	Key string `datastore:",noindex"`
 
 	// The order of this item within the list. Lower numbers come before
 	// higher numbers.
 	Order int
 
 	// The string representing the list item.
-	Name string
+	Name string `datastore:",noindex"`
 
 	// The state of completion of this list item..
-	Completed bool
+	Completed bool `datastore:",noindex"`
 
 	// If delete is true, when this item is merged with other items,
 	// this item will be removed from the merged list. See
 	// Merge for more information.
-	Delete bool
+	Delete bool `datastore:"-"`
 }
 
 // ItemsList is a list of Items that has the ability reset the orders
@@ -46,11 +46,11 @@ func (li ItemsList) SetOrders() {
 // datastore.
 type List struct {
 	// The name of the list.
-	Name string
+	Name string `datastore:",noindex"`
 
 	// A URL safe version of the datastores key for this list. It
 	// is not stored in the datastore.
-	Key string
+	Key string `datastore:",noindex"`
 
 	// This is the time the list was last modified.
 	LastModified time.Time

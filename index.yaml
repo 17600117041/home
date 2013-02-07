@@ -18,4 +18,4 @@ indexes:
 - kind: List
   ancestor: yes
   properties:
-  - name: Order
+  - name: LastModified

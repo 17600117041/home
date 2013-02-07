@@ -7,6 +7,7 @@ package list
 import (
 	"appengine"
 	"appengine/datastore"
+	"appengine/memcache"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/icub3d/gorca"
@@ -80,6 +81,12 @@ func PutList(w http.ResponseWriter, r *http.Request) {
 			return fmt.Errorf("putting list")
 		}
 
+		// Remove it from memcache
+		memcache.Set(c, &memcache.Item{
+			Key:   key,
+			Value: []byte(fmt.Sprintf("%d", ol.LastModified.Unix())),
+		})
+
 		// Return the updated list back.
 		gorca.WriteJSON(c, w, r, ol)
 
@@ -104,6 +111,9 @@ func DeleteList(w http.ResponseWriter, r *http.Request) {
 		if !gorca.DeleteStringKeyAndAncestors(c, w, r, "Item", key) {
 			return fmt.Errorf("deleting list and items")
 		}
+
+		// Remove it from memcache
+		memcache.Delete(c, key)
 
 		gorca.WriteSuccessMessage(c, w, r)
 

@@ -12,20 +12,18 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 									 $timeout.cancel($scope.timer);
 							 });
 
-		// Check for changes every 30 seconds.
+		// Check for changes every 90 seconds.
 		$scope.checkupdate = function() {
 				List.checkupdate($scope.list, function(u) {
 														 $scope.updatable = u;
 
-														 // If there are no changes and we have
-														 // changes, let's save them.
-														 if (u == false && $scope.dirty) {
-																 $scope.save();
+														 if ($scope.updatable && !$scope.dirty) {
+																 $scope.updateoverwrite();
 														 }
 												 });
-				$scope.timer = $timeout($scope.checkupdate, 30000);
+				$scope.timer = $timeout($scope.checkupdate, 90000);
 		};
-		$scope.timer = $timeout($scope.checkupdate, 30000);
+		$scope.timer = $timeout($scope.checkupdate, 90000);
 
 		// This is called when the update button is pressed.
 		$scope.update = function() {

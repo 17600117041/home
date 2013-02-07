@@ -32,7 +32,7 @@
 								<i class="icon-file icon-white"></i>
 								Copy
 							</button>
-							<button class="btn btn-danger" data-ng-click="delete(list.Key, $event)">
+							<button class="btn btn-danger" data-ng-click="delete($index, list.Key, $event)">
 								<i class="icon-remove icon-white"></i>
 								Delete
 							</button>
@@ -81,13 +81,13 @@ pressed. -->
   </div>
 </div>
 
-<div id="newModal" class="modal hide">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>New List</h3>
-  </div>
-  <div class="modal-body">
-		<form name="newlist">
+<form name="newlist">
+	<div id="newModal" class="modal hide">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3>New List</h3>
+		</div>
+		<div class="modal-body">
 			<div class="control-group"
 					 ata-ng-class="{error: newlist.name.$invalid}">
 				<label>Name</label>
@@ -96,20 +96,20 @@ pressed. -->
 					Required
 				</span>
 			</div>
-		</form>
-  </div>
-  <div class="modal-footer">
-		<button data-ng-click="back()" class="btn">
-			<i class="icon-remove-sign"></i>
-			Cancel
-		</button>
-		<button data-ng-click="save()" data-ng-disabled="newlist.$invalid"
-						class="btn btn-primary">
-			<i class="icon-hdd icon-white"></i>
-			Create
-		</button>
-  </div>
-</div>
+		</div>
+		<div class="modal-footer">
+			<button data-ng-click="save()" data-ng-disabled="newlist.$invalid"
+							class="btn btn-primary pull-right">
+				<i class="icon-hdd icon-white"></i>
+				Create
+			</button>
+			<button data-ng-click="back()" class="btn pull-right">
+				<i class="icon-remove-sign"></i>
+				Cancel
+			</button>
+		</div>
+	</div>
+</form>
 
 <!-- This is the modal that pops up when the delete button is
 pressed. -->

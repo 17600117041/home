@@ -39,7 +39,8 @@ function ListsCtrl($scope, $location, List) {
 
 		// This function opens up the modal to verify that 
 		// they want to delete the list.
-		$scope.delete = function(key, event) {
+		$scope.delete = function(index, key, event) {
+				$scope.deleteIndex = index;
 				$scope.deleteKey = key;
 
 				$('#deleteModal').modal();
@@ -52,9 +53,7 @@ function ListsCtrl($scope, $location, List) {
 		$scope.sure = function() {
 				$('#deleteModal').modal('hide');
 				List.delete($scope.deleteKey, function() {
-												List.getall(function (lists) {
-																				$scope.lists = lists;
-																		});
+												$scope.lists.splice($scope.deleteIndex, 1);
 										});
 		};
 
