@@ -74,6 +74,14 @@ func GetList(w http.ResponseWriter, r *http.Request) {
 func notmod(c appengine.Context, w http.ResponseWriter,
 	r *http.Request, key string, date string) {
 
+	// Convert the given string.
+	i, err := strconv.ParseInt(date, 10, 64)
+	if err != nil {
+		gorca.LogAndFailed(c, w, r, err)
+		return
+	}
+	t := time.Unix(i, 0)
+
 	// Try to get the key from memcache
 	item, err := memcache.Get(c, key)
 	if err != nil && err != memcache.ErrCacheMiss {
@@ -81,29 +89,39 @@ func notmod(c appengine.Context, w http.ResponseWriter,
 		return
 	}
 
+	var mt time.Time
+
+	// Check to see if it's simply not there.
 	if err == memcache.ErrCacheMiss {
 		gorca.Log(c, r, "info", "failed to get memcache: %s", key)
-		gorca.WriteMessage(c, w, r, "success", "Modified.",
-			http.StatusOK)
-		return
-	}
 
-	// Convert the memcache string.
-	mi, err := strconv.ParseInt(string(item.Value), 10, 64)
-	if err != nil {
-		gorca.LogAndFailed(c, w, r, err)
-		return
-	}
+		// Try to get the list.
+		l, ok := GetListHelper(c, w, r, key)
+		if !ok {
+			return
+		}
 
-	// Convert the given string.
-	i, err := strconv.ParseInt(date, 10, 64)
-	if err != nil {
-		gorca.LogAndFailed(c, w, r, err)
-		return
-	}
+		// Save the results to memcache.
+		item := &memcache.Item{
+			Key:   key,
+			Value: []byte(fmt.Sprintf("%d", l.LastModified.Unix())),
+		}
+		if err := memcache.Set(c, item); err != nil {
+			gorca.Log(c, r, "error", "failed to set memcache: %v", err)
+		}
 
-	mt := time.Unix(mi, 0)
-	t := time.Unix(i, 0)
+		mt = l.LastModified
+	} else {
+		// Convert the memcache string.
+		mi, err := strconv.ParseInt(string(item.Value), 10, 64)
+		if err != nil {
+			gorca.LogAndFailed(c, w, r, err)
+			return
+		}
+
+		mt = time.Unix(mi, 0)
+
+	}
 
 	if mt.Equal(t) {
 		// Write out the not modified.
