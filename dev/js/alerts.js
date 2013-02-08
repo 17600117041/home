@@ -5,14 +5,11 @@
  */
 
 // AlertsCtrl is the controller for part of the site that lists all of
-// the lists.
+// alert messages. The Alerts service keeps track of the alerts and
+// this controller adds them as toast messages that can be removed.
 function AlertsCtrl($scope, Alerts) {
 		$scope.alerts = Alerts.alerts;
 		
-		$scope.$watch(Alerts.alerts, function() {
-				$scope.alerts = Alerts.alerts;
-		});
-
 		$scope.remove = function(index) {
 				Alerts.remove(index);
 		};

@@ -25,8 +25,7 @@ describe('AlertsCtrl', function(){
 
 		it("should keep it's alerts in sycn with the Alerts service." , 
 			 function() {
-					 var len = 0;
-					 // Add a message.
+					 // These are some messages we are going to add for testing.
 					 var ms = [
 							 {
 									 type: "info",
@@ -50,6 +49,9 @@ describe('AlertsCtrl', function(){
 							 }
 					 ];
 
+					 // When we add an item, the new top item should be the most
+					 // recently added item.
+					 var len = 0;
 					 for (var x = 0; x < ms.length; x++) {
 							 scope.$apply(alerts.add(ms[x].type, ms[x].strong, ms[x].message));
 							 len++;
@@ -58,6 +60,14 @@ describe('AlertsCtrl', function(){
 							 expect(scope.alerts[0].type).toBe(ms[x].type);
 							 expect(scope.alerts[0].strong).toBe(ms[x].strong);
 							 expect(scope.alerts[0].message).toBe(ms[x].message);
+					 }
+
+					 // When we remove an item, the scope should reflect the
+					 // change.
+					 while (scope.alerts.length > 0) {
+							 len = scope.alerts.length;
+							 scope.remove(0);
+							 expect(scope.alerts.length).toBe(len - 1);
 					 }
 			 });
 });
