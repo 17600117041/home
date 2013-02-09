@@ -21,7 +21,7 @@
 					<i class="icon-trash icon-white"></i>
 					Clean
 				</a>
-				<a role="button" class="btn" 
+				<button role="button" class="btn" 
 					 data-toggle="modal"
 					 href="#updateModal"
 					 data-ng-class="{'btn-danger': updatable}"
@@ -29,7 +29,7 @@
 					<i class="icon-refresh"
 						 data-ng-class="{'icon-white': updatable}"></i>
 					Update
-				</a>
+				</button>
 				<button class="btn" 
 					 data-ng-class="{'btn-success': dirty}"
 					 data-ng-disabled="!dirty"
@@ -68,7 +68,7 @@
 						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 					</div>
 					<div class="checkbox">
-						<input type="checkbox" data-ng-change="dirty()" 
+						<input type="checkbox" data-ng-change="dirtify()" 
 									 data-ng-model="item.Completed">
 						<div class="done-{{item.Completed}}">
 							<!-- This is the text box that will show up when the

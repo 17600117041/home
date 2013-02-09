@@ -98,7 +98,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 		// dirty is a helper function that marks the list dirty when an
 		// item is checked.
-		$scope.dirty = function() {
+		$scope.dirtify = function() {
 				$scope.dirty = true;
 		};
 
