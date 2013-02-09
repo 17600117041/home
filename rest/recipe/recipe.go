@@ -15,7 +15,7 @@ type Recipe struct {
 	Key string `datastore:",noindex"`
 
 	// The title of the recipe.
-	Title string
+	Name string
 
 	// The URL where the recipe was originally pulled from.
 	URL string `datastore:",noindex"`

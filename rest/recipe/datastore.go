@@ -5,7 +5,7 @@ import (
 	"appengine/datastore"
 	"appengine/urlfetch"
 	"github.com/icub3d/gorca"
-	"github.com/icub3d/list/rest/recipe/parsers"
+	"github.com/icub3d/home/rest/recipe/parsers"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -102,7 +102,7 @@ func updateRecipeFromURL(c appengine.Context, w http.ResponseWriter,
 		return false
 	}
 
-	if p != nil {
+	if p == nil {
 		gorca.Log(c, r, "warn", "no parser found for: %s", recipe.URL)
 		return true
 	}
@@ -121,7 +121,7 @@ func updateRecipeFromURL(c appengine.Context, w http.ResponseWriter,
 		return false
 	}
 
-	recipe.Title = p.GetTitle(body)
+	recipe.Name = p.GetName(body)
 	recipe.Ingredients = p.GetIngredients(body)
 	recipe.Directions = p.GetDirections(body)
 

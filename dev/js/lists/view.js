@@ -4,8 +4,8 @@
 	the LICENSE file.
 */
 
-// ViewCtrl is the controller for viewing and updating lists.
-function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
+// ListsViewCtrl is the controller for viewing and updating lists.
+function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 		// Cancel the update checks when we leave.
 		$scope.$on('$destroy', function() {
@@ -14,53 +14,36 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
 		// Check for changes every 30 seconds.
 		$scope.checkupdate = function() {
-				List.checkupdate($scope.list, function(u) {
+				Lists.checkupdate($scope.list, function(u) {
 														 $scope.updatable = u;
 
 														 if ($scope.updatable && !$scope.dirty) {
-																 $scope.updateoverwrite();
+																 $scope.overwrite();
 														 }
 												 });
 				$scope.timer = $timeout($scope.checkupdate, 30000);
 		};
 		$scope.timer = $timeout($scope.checkupdate, 30000);
 
-		// This is called when the update button is pressed.
-		$scope.update = function() {
-				if ($scope.dirty) {
-						// Ask them if they want to merge their changes 
-						// if there are changes.
-						$('#updateModal').modal();
-				} else {
-						// Otherwise, we can just update.
-						List.get($routeParams.id, function(l) {
-												 $scope.list = l;
-										 });
-						$scope.updatable = false;
-				}
-		};
-
 		// This is called when they want to merge their changes with 
 		// the latest list.
-		$scope.updatemerge = function() {
+		$scope.merge = function() {
 				$scope.save();	
 				$scope.updatable = false;
-				$('#updateModal').modal('hide');
 		};
 
 		// This is called when they want to just get the updated list 
 		// and lose their changes.
-		$scope.updateoverwrite = function() {
-				List.get($routeParams.id, function(l) {
+		$scope.overwrite = function() {
+				Lists.get($routeParams.id, function(l) {
 										 $scope.list = l;
 								 });
 				$scope.updatable = false;
-				$('#updateModal').modal('hide');
 		};
 
 		// When the order of the list items change, this is called to 
 		// update the internal array that is storing the list items.
-		$scope.sort = function(event, ui) {
+		$scope.sort = function() {
 				var ids = $("#sortablelist").sortable("toArray");
 				var items = new Array();
 
@@ -93,27 +76,20 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 		};
 
 
-		// Bring up the modal to clean completed items.
-		$scope.clean = function(key, event) {
-				$('#cleanModal').modal();
-		};
-
 		// Mark completed items for deletion.
-		$scope.sureclean = function() {
+		$scope.sure = function() {
 				$scope.list.Items
 						.forEach(function (e) {
 												 if (e.Completed) {
 														 e.Delete = true;
 												 }
 										 });
-				
 				$scope.dirty = true;
-				$('#cleanModal').modal('hide');
 		};
 
 		// Save changes to the list and update the list.
 		$scope.save = function() {
-				List.save($scope.list, function(l){
+				Lists.save($scope.list, function(l){
 											$scope.list = l;
 											$scope.dirty = false;
 									});
@@ -121,8 +97,7 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
 		// A helper function that marks the list dirty when an item is
 		// checked.
-		$scope.check = function(item) {
-				item.Completed = !item.Completed;
+		$scope.dirty = function() {
 				$scope.dirty = true;
 		};
 
@@ -132,28 +107,16 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 				return !item.Delete;
 		};
 		
-		// Stop propogating a click. This is mainly used by the list
-		// item input text boxes so they don't change the completed 
-		// state of the item when they are clicked.
-		$scope.noclick = function(event) {
-				// Don't let it fall through to the view.
-				event.stopPropagation();
-		};
-
 		// This changes the state of the item being edited. There 
 		// are two special values: -1 is for no item, and -2 is the 
 		// title of the list.
-		$scope.edit = function(id, event) {
+		$scope.edit = function(id) {
 				$scope.editing = id;
 				$scope.dirty = true;
-				// Don't let it fall through to the view.
-				if (event != undefined) {
-						event.stopPropagation();		
-				}
 		};
 
 		// Get the list items.
-		List.get($routeParams.id, function(l) {
+		Lists.get($routeParams.id, function(l) {
 								 $scope.list = l;
 
 								 // Make the list sortable.
@@ -171,5 +134,8 @@ function ViewCtrl($scope, $location, $routeParams, $timeout, List) {
 
 		// We start out not editing any list.
 		$scope.editing = -1;
+
+		// The list should start clean.
+		$scope.dirty = false;
 }
-ViewCtrl.$inject = ['$scope', '$location', '$routeParams', '$timeout', 'List'];
+ListsViewCtrl.$inject = ['$scope', '$routeParams', '$timeout', 'Lists'];

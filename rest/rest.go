@@ -8,8 +8,9 @@ package rest
 
 import (
 	"github.com/icub3d/gorca"
-	"github.com/icub3d/list/rest/list"
-	"github.com/icub3d/list/rest/user"
+	"github.com/icub3d/home/rest/list"
+	"github.com/icub3d/home/rest/recipe"
+	"github.com/icub3d/home/rest/user"
 	"net/http"
 )
 
@@ -19,6 +20,9 @@ func init() {
 
 	// Manage the lists
 	http.Handle("/rest/list/", list.MakeMuxer("/rest/list/"))
+
+	// Manage the recipes
+	http.Handle("/rest/recipe/", recipe.MakeMuxer("/rest/recipe/"))
 
 	// Everything else should return a 404 and JSON error.
 	http.HandleFunc("/", gorca.NotFoundFunc)

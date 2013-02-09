@@ -15,8 +15,8 @@ import (
 // RecipeParser is an interface that cleans information from data
 // about a recipe.
 type RecipeParser interface {
-	// GetTitle gets the title of the recipe.
-	GetTitle(data []byte) string
+	// GetName gets the title of the recipe.
+	GetName(data []byte) string
 
 	// GetIngredients returns a list of ingredients for the recipe.
 	GetIngredients(data []byte) []string

@@ -12,8 +12,8 @@ import (
 // allrecipes.com.
 type AllRecipesDotComParser struct{}
 
-// GetTitle gets the title of the recipe.
-func (a AllRecipesDotComParser) GetTitle(data []byte) string {
+// GetName gets the title of the recipe.
+func (a AllRecipesDotComParser) GetName(data []byte) string {
 	return getFirstH1(data)
 }
 

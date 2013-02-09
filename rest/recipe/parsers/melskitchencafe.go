@@ -13,8 +13,8 @@ import (
 // melskitchencafe.com.
 type MelsKitchenCafeDotComParser struct{}
 
-// GetTitle gets the title of the recipe.
-func (a MelsKitchenCafeDotComParser) GetTitle(data []byte) string {
+// GetName gets the title of the recipe.
+func (a MelsKitchenCafeDotComParser) GetName(data []byte) string {
 	return getFirstH1(data)
 }
 

@@ -26,7 +26,6 @@ body {
 /* To enable sorting, we use a list instead of a table, so we
 implement the table striping for lists. */
 .list-striped > li {
-		line-height: 20px; 
 		padding: 8px; 
 		border-top: 1px solid #dddddd; 
 }

@@ -16,23 +16,24 @@
 		<div class="clearfix">
 			<!-- The table header with buttons. -->
 			<div class="pad-bottom pull-right">
-				<button class="btn btn-warning" 
-								data-ng-click="clean()">
+				<a role="button" class="btn btn-warning" 
+					 href="#cleanModal" data-toggle="modal">
 					<i class="icon-trash icon-white"></i>
 					Clean
-				</button>
-				<button class="btn" 
-								data-ng-class="{'btn-danger': updatable}"
-								data-ng-disabled="!updatable"
-								data-ng-click="update()">
+				</a>
+				<a role="button" class="btn" 
+					 data-toggle="modal"
+					 href="#updateModal"
+					 data-ng-class="{'btn-danger': updatable}"
+					 data-ng-disabled="!updatable">
 					<i class="icon-refresh"
 						 data-ng-class="{'icon-white': updatable}"></i>
 					Update
-				</button>
+				</a>
 				<button class="btn" 
-								data-ng-class="{'btn-success': dirty}"
-								data-ng-disabled="!dirty"
-								data-ng-click="save()">
+					 data-ng-class="{'btn-success': dirty}"
+					 data-ng-disabled="!dirty"
+					 data-ng-click="save()">
 					<i class="icon-hdd"
 						 data-ng-class="{'icon-white': dirty}"
 						 ></i>
@@ -63,27 +64,24 @@
 			<ul class="unstyled list-striped" id="sortablelist">
 				<li id="list-item-{{$index}}"
 						data-ng-repeat="item in list.Items | filter:noshow">
-					<div class="checkbox pointer-cursor" 
-							 data-ng-click="check(item)">
-						<input type="checkbox" data-ng-change="check(item)" 
-									 class="pull-left"
+					<div class="pull-right btn btn-info drag-icon">
+						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
+					</div>
+					<div class="checkbox">
+						<input type="checkbox" data-ng-change="dirty()" 
 									 data-ng-model="item.Completed">
-						<div class="pull-left done-{{item.Completed}}">
+						<div class="done-{{item.Completed}}">
 							<!-- This is the text box that will show up when the
 							item is clicked. -->
-							<input data-ng-click="noclick($event)" 
-										 id="editing-item-{{$index}}"
+							<input id="editing-item-{{$index}}"
 										 data-ng-hasfocus="editing == $index"
 										 class="editing-item" data-ng-show="editing == $index"
 										 type="text" data-ng-model="item.Name">
 							<span id="viewing-item-{{$index}}" data-ng-show="editing != $index"
 										class="viewing-item"
-										data-ng-click="edit($index, $event)">
+										data-ng-click="edit($index)">
 								{{item.Name}}
 							</span>
-						</div>
-						<div class="pull-right btn btn-info drag-icon">
-							<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 						</div>
 					</div>
 				</li>
@@ -113,13 +111,15 @@ clicked but there local changes. -->
 			<i class="icon-remove-sign"></i>
 			Cancel
 		</button>
-		<button class="btn btn-danger" 
-						data-ng-click="updateoverwrite()">
+		<button class="btn btn-danger"
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="overwrite()">
 			<i class="icon-remove icon-white"></i>
 			Overwrite
 		</button>
 		<button class="btn btn-info" 
-						data-ng-click="updatemerge()">
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="merge()">
 			<i class="icon-tasks icon-white"></i>
 			Merge
 		</button>
@@ -141,7 +141,8 @@ clicked but there local changes. -->
 			Cancel
 		</button>
 		<button class="pull-right btn btn-warning" 
-						data-ng-click="sureclean()">
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="sure()">
 			<i class="icon-trash icon-white"></i>
 			Clean
 		</button>
