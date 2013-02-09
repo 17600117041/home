@@ -3,29 +3,40 @@ package recipe
 import (
 	"appengine"
 	"appengine/datastore"
+	"appengine/urlfetch"
 	"github.com/icub3d/gorca"
+	"github.com/icub3d/list/rest/recipe/parsers"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-// NewRecipeHelper is a helper function that creates a new recipe in the
-// datastore for the given recipe. The given recipe is updated with the
-// keys. If a failure occured, false is returned and a response was
-// returned to the request. This case should be terminal.
+// NewRecipeHelper is a helper function that creates a new recipe in
+// the datastore for the given recipe. If the URL field is not empty
+// and the direction and ingredients are, an attempt is made to parse
+// the recipe from the URL. If a failure occured, false is returned
+// and a response was returned to the request. This case should be
+// terminal.
 func NewRecipeHelper(c appengine.Context, w http.ResponseWriter,
-	r *http.Request, l *Recipe) bool {
+	r *http.Request, recipe *Recipe) bool {
 
 	// Blank out the recipe key and the item keys.
-	l.Key = ""
-	for _, item := range l.Items {
-		item.Key = ""
-	}
+	recipe.Key = ""
 
 	// Set the date to now.
-	l.LastModified = time.Now()
+	recipe.LastModified = time.Now()
+
+	if recipe.URL != "" && len(recipe.Ingredients) == 0 &&
+		len(recipe.Directions) == 0 {
+
+		ok := updateRecipeFromURL(c, w, r, recipe)
+		if !ok {
+			return false
+		}
+	}
 
 	// Save the new recipe.
-	if !PutRecipeHelper(c, w, r, l) {
+	if !PutRecipeHelper(c, w, r, recipe) {
 		return false
 	}
 
@@ -47,51 +58,24 @@ func GetRecipeHelper(c appengine.Context, w http.ResponseWriter,
 	}
 
 	// Get the recipe by key.
-	var l Recipe
-	if err := datastore.Get(c, k, &l); err != nil {
+	var recipe Recipe
+	if err := datastore.Get(c, k, &recipe); err != nil {
 		gorca.LogAndNotFound(c, w, r, err)
 		return nil, false
 	}
 
-	// Get all of the items for the recipe.
-	var li ItemsRecipe
-	q := datastore.NewQuery("Item").Ancestor(k).Order("Order")
-	if _, err := q.GetAll(c, &li); err != nil {
-		gorca.LogAndUnexpected(c, w, r, err)
-		return nil, false
-	}
-
-	l.Items = li
-
-	return &l, true
+	return &recipe, true
 }
 
-// PutRecipeHelepr saves the recipe and it's items to the datastore. If
-// the recipe or any of it's items don't have a key, a key will be made
-// for it.
+// PutRecipeHelepr saves the recipe to the datastore. If the recipe
+// doesn't have a key, a key will be made for it.
 func PutRecipeHelper(c appengine.Context, w http.ResponseWriter,
 	r *http.Request, l *Recipe) bool {
 
-	// This is the recipe of keys we are going to PutMulti.
-	keys := make([]string, 0, len(l.Items)+1)
-
-	// This is the recipe of things we are going to put.
-	values := make([]interface{}, 0, len(l.Items)+1)
-
-	// We need the key to generate new keys and we might not even have
-	// one.
-	var lkey *datastore.Key
-	var skey string
-	var ok bool
-	if l.Key != "" {
-		// Just convert the key we already have.
-		lkey, ok = gorca.StringToKey(c, w, r, l.Key)
-		if !ok {
-			return false
-		}
-	} else {
+	// We may need to make a key.
+	if l.Key == "" {
 		// Make a key and save it's value to the recipe.
-		skey, lkey, ok = gorca.NewKey(c, w, r, "Recipe", nil)
+		skey, _, ok := gorca.NewKey(c, w, r, "Recipe", nil)
 		if !ok {
 			return false
 		}
@@ -99,27 +83,47 @@ func PutRecipeHelper(c appengine.Context, w http.ResponseWriter,
 		l.Key = skey
 	}
 
-	// Add the recipe itself.
-	keys = append(keys, l.Key)
-	values = append(values, l)
+	// Save them all.
+	return gorca.PutStringKeys(c, w, r, []string{l.Key}, []interface{}{l})
+}
 
-	// Add the items in the recipe.
-	for _, item := range l.Items {
-		if item.Key != "" {
-			keys = append(keys, item.Key)
-		} else {
-			skey, _, ok := gorca.NewKey(c, w, r, "Item", lkey)
-			if !ok {
-				return false
-			}
+// updateRecipeFromURL is a helper function that attempts to parse the
+// recipe URL to get the recipe data. If an error occurs, false is
+// returned and a proper message will have been sent as a
+// response. This case should be terminal. If a parser isn't available
+// for the URL, no error is returned, but nothing is changed in the
+// recipe.
+func updateRecipeFromURL(c appengine.Context, w http.ResponseWriter,
+	r *http.Request, recipe *Recipe) bool {
 
-			item.Key = skey
-			keys = append(keys, skey)
-		}
-
-		values = append(values, item)
+	p, err := parsers.GetParserForURL(recipe.URL)
+	if err != nil {
+		gorca.LogAndUnexpected(c, w, r, err)
+		return false
 	}
 
-	// Save them all.
-	return gorca.PutStringKeys(c, w, r, keys, values)
+	if p != nil {
+		gorca.Log(c, r, "warn", "no parser found for: %s", recipe.URL)
+		return true
+	}
+
+	client := urlfetch.Client(c)
+	resp, err := client.Get(recipe.URL)
+	if err != nil {
+		gorca.LogAndUnexpected(c, w, r, err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		gorca.LogAndUnexpected(c, w, r, err)
+		return false
+	}
+
+	recipe.Title = p.GetTitle(body)
+	recipe.Ingredients = p.GetIngredients(body)
+	recipe.Directions = p.GetDirections(body)
+
+	return true
 }

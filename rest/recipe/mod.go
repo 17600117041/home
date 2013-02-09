@@ -60,40 +60,28 @@ func PutRecipe(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Get the new recipe from the body.
-		var nr Recipe
-		if !gorca.UnmarshalFromBodyOrFail(c, w, r, &nr) {
+		nr := &Recipe{}
+		if !gorca.UnmarshalFromBodyOrFail(c, w, r, nr) {
 			return fmt.Errorf("unmarshalling")
 		}
 
-		// Merge the new ingredients into the old recipe and remove
-		// deleted keys.
-		delskeys := or.Ingredients.Merge(&(nr.Ingredients))
-		if !gorca.DeleteStringKeys(c, w, r, delskeys) {
-			return fmt.Errorf("deleting ingredient keys")
-		}
-
-		// Merge the new directions into the old recipe and remove deleted keys.
-		delskeys = or.Diretions.Merge(&(nr.Directions))
-		if !gorca.DeleteStringKeys(c, w, r, delskeys) {
-			return fmt.Errorf("deleting direction keys")
-		}
-
 		// Update the values.
-		or.LastModified = time.Now()
-		or.Title = nr.Name
+		nr.Key = or.Key
+		nr.URL = or.URL
+		nr.LastModified = time.Now()
 
-		if !PutRecipeHelper(c, w, r, or) {
+		if !PutRecipeHelper(c, w, r, nr) {
 			return fmt.Errorf("putting recipe")
 		}
 
 		// Remove it from memcache
 		memcache.Set(c, &memcache.Item{
 			Key:   key,
-			Value: []byte(fmt.Sprintf("%d", or.LastModified.Unix())),
+			Value: []byte(fmt.Sprintf("%d", nr.LastModified.Unix())),
 		})
 
 		// Return the updated recipe back.
-		gorca.WriteJSON(c, w, r, or)
+		gorca.WriteJSON(c, w, r, nr)
 
 		return nil
 	}, nil)
@@ -113,9 +101,8 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request) {
 
 	datastore.RunInTransaction(c, func(c appengine.Context) error {
 
-		if !gorca.DeleteStringKeyAndAllAncestors(c, w, r,
-			[]string{"List", "Items"}, key) {
-			return fmt.Errorf("deleting recipe and items")
+		if !gorca.DeleteStringKeys(c, w, r, []string{key}) {
+			return fmt.Errorf("deleting recipe")
 		}
 
 		// Remove it from memcache

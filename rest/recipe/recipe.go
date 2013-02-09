@@ -6,7 +6,6 @@
 package recipe
 
 import (
-	"github.com/icub3d/list/rest/list"
 	"time"
 )
 
@@ -24,17 +23,9 @@ type Recipe struct {
 	// This is the time the recipe was last modified.
 	LastModified time.Time
 
-	// A URL safe version of the datastores key for the list of
-	// ingredients.
-	IngredientsKey string `datastore:",noindex"`
+	// The list of ingredients. 
+	Ingredients []string `datastore:",noindex"`
 
-	// A URL safe version of the datastores key for the list of
-	// directions.
-	DirectionsKey string `datastore:",noindex"`
-
-	// The list of ingredients. This will be managed internally.
-	Ingredients list.List `datastore:"-"`
-
-	// The list of directions. This will be managed internally.
-	Directions list.List `datastore:"-"`
+	// The list of directions. 
+	Directions []string `datastore:",noindex"`
 }
