@@ -7,7 +7,6 @@ package recipe
 import (
 	"appengine"
 	"appengine/datastore"
-	"appengine/memcache"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/icub3d/gorca"
@@ -74,12 +73,6 @@ func PutRecipe(w http.ResponseWriter, r *http.Request) {
 			return fmt.Errorf("putting recipe")
 		}
 
-		// Remove it from memcache
-		memcache.Set(c, &memcache.Item{
-			Key:   key,
-			Value: []byte(fmt.Sprintf("%d", nr.LastModified.Unix())),
-		})
-
 		// Return the updated recipe back.
 		gorca.WriteJSON(c, w, r, nr)
 
@@ -104,9 +97,6 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request) {
 		if !gorca.DeleteStringKeys(c, w, r, []string{key}) {
 			return fmt.Errorf("deleting recipe")
 		}
-
-		// Remove it from memcache
-		memcache.Delete(c, key)
 
 		gorca.WriteSuccessMessage(c, w, r)
 

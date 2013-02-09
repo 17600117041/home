@@ -25,14 +25,14 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		};
 		$scope.timer = $timeout($scope.checkupdate, 30000);
 
-		// This is called when they want to merge their changes with 
+		// merge is called when they want to merge their changes with 
 		// the latest list.
 		$scope.merge = function() {
 				$scope.save();	
 				$scope.updatable = false;
 		};
 
-		// This is called when they want to just get the updated list 
+		// overwrite is called when they want to just get the updated list 
 		// and lose their changes.
 		$scope.overwrite = function() {
 				Lists.get($routeParams.id, function(l) {
@@ -41,7 +41,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				$scope.updatable = false;
 		};
 
-		// When the order of the list items change, this is called to 
+		// sort updates the order of the list items. This is called to
 		// update the internal array that is storing the list items.
 		$scope.sort = function() {
 				var ids = $("#sortablelist").sortable("toArray");
@@ -59,8 +59,9 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				$scope.dirty = true;
 		};
 
-		// Add a new item to the list of items.
+		// add adds a new item to the top list of items.
 		$scope.add = function() {
+				// Make a list if we don't have one.
 				if ($scope.list.Items == null) {
 						$scope.list.Items = new Array();
 				}
@@ -76,7 +77,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		};
 
 
-		// Mark completed items for deletion.
+		// sure marks completed items for deletion.
 		$scope.sure = function() {
 				$scope.list.Items
 						.forEach(function (e) {
@@ -87,7 +88,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				$scope.dirty = true;
 		};
 
-		// Save changes to the list and update the list.
+		// save saves changes to the list and update the list.
 		$scope.save = function() {
 				Lists.save($scope.list, function(l){
 											$scope.list = l;
@@ -95,19 +96,19 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 									});
 		};
 
-		// A helper function that marks the list dirty when an item is
-		// checked.
+		// dirty is a helper function that marks the list dirty when an
+		// item is checked.
 		$scope.dirty = function() {
 				$scope.dirty = true;
 		};
 
-		// A helper function that filters the list to not show items
-		// scheduled for deletion.
+		// noshow is a helper function that filters the list to not show
+		// items scheduled for deletion.
 		$scope.noshow = function(item) {
 				return !item.Delete;
 		};
 		
-		// This changes the state of the item being edited. There 
+		// edit changes the state of the item being edited. There 
 		// are two special values: -1 is for no item, and -2 is the 
 		// title of the list.
 		$scope.edit = function(id) {

@@ -4,7 +4,7 @@
  LICENSE file.
  */
 
-/* This is an interface to the RESTful Recipe service. We have 
+/* RecipesService is an interface to the RESTful Recipe service. We have 
  * to use a service here because go and angular don't play nicely 
  * together with trailing slashes. 
  */

@@ -4,8 +4,9 @@
  LICENSE file.
  */
 
-/* This is an interface to the RESTful User service. */
+/* UserService is an interface to the RESTful User service. */
 function UserService($http, Alerts) {
+		// Get the currently logged in user.
 		this.get = function(call) {
 				var promise = $http.get("/rest/user/");
 				var error = {

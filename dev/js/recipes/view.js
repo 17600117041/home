@@ -5,28 +5,33 @@
  */
 
 // RecipesViewCtrl is the controller for viewing and updating recipes.
-function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lists) {
+function RecipesViewCtrl($scope, $routeParams, $timeout, 
+												 $location, Recipes, Lists) {
 
-		// When the order of the recipe items change, this is called to 
-		// update the internal array that is storing the recipe items.
+		// sort is called When the order of the recipe items change. This
+		// is called to update the internal array that is storing the
+		// recipe items. The name passed differentiates between
+		// ingredients and directions.
 		$scope.sort = function(name) {
 				var ids = $("#sortable" + name).sortable("toArray");
 				var items = new Array();
 
-				// Make a new recipe from the array.
+				// Make a new list from the array.
 				ids.forEach(function(e, i, a) {
 						var eid = e.replace("recipe-"+name+"-", "");
 						var id = parseInt(eid);
 						items.push($scope[name][id]);
 				});
 
-				// Set the recipe ot be the newly made recipe.				
+				// Set the list to be the newly made list.
 				$scope[name] = items;
 				$scope.dirty = true;
 		};
 
-		// Add a new item to the recipe.
+		// add adds a new item to the recipe. The given type is used to
+		// add it to the right place: ingredients or directions.
 		$scope.add = function(type) {
+				// Create the list if we don't have one yet.
 				if ($scope[type] == null) {
 						$scope[type] = new Array();
 				}
@@ -37,15 +42,16 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 				$scope.toadd[type] = "";
 		};
 
-		// If we add this to a list, we need to get all the lists.
+		// getlists loads a list of current lists for the add to list
+		// modal.
 		$scope.getlists = function() {
 				Lists.getall(function (lists) {
 						$scope.lists = lists;
 				});
 		};
 
-		// Make a copy of each of the ingredients and push it onto the
-		// list. Then save the list.
+		// copy makes a copy of each of the ingredients and push it onto
+		// the list. It then save the list.
 		$scope.copy = function() {
 				$scope.copyList.Items = new Array();
 				$scope.Ingredients.forEach(function(e, i, a) {
@@ -62,7 +68,7 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 		};
 
 
-		// Save changes to the recipe and update the recipe.
+		// Save saves changes to the recipe back to the datastore.
 		$scope.save = function() {
 				$scope.saveobj();
 				Recipes.save($scope.recipe, function(l){
@@ -72,18 +78,22 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 				});
 		};
 
-		// This changes the state of the item being edited. There 
-		// are two special values: -1 is for no item, and -2 is the 
-		// title of the recipe.
+		// edit changes the state of the item being edited. There are two
+		// special values: -1 is for no item, and -2 is the title of the
+		// recipe. The type determines withere it's the ingredient or
+		// direction that should be edited.
 		$scope.edit = function(id, type) {
 				$scope.editingtype = type;
 				$scope.editing = id;
 				$scope.dirty = true;
 		};
 
-		// Convert the []string of ingredients to objects that angularjs
-		// can handle.
+		// makeobj converts the []string of ingredients to objects that
+		// angularjs can handle. This should be called when we get a new
+		// recipe from the datastore.
 		$scope.makeobj = function() {
+				// Get an object array of the ingredients with the string
+				// saved to the object value.
 				var ingredients = new Array();
 				if ($scope.recipe.Ingredients != undefined &&
 						$scope.recipe.Ingredients != null) {
@@ -91,6 +101,9 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 								ingredients.push({value: e});
 						});
 				}
+
+				// Get an object array of the directions with the string
+				// saved to the object value.
 				var directions = new Array();
 				if ($scope.recipe.Directions != undefined &&
 						$scope.recipe.Directions != null) {
@@ -98,12 +111,18 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 								directions.push({value: e});
 						});
 				}
+
+				// Set the scopes lists to the lists we just made.
 				$scope.Ingredients = ingredients;
 				$scope.Directions = directions;
 		};
 
-		// Convert the objects back to a []string so go can save them.
+		// saveobj converts the objects back to a []string so go can save
+		// them. This should be called before we save the recipe to the
+		// datastore.
 		$scope.saveobj = function() {
+				// Generate a []string of the ingredients from the objects
+				// values.
 				var ingredients = new Array();
 				if ($scope.Ingredients != undefined &&
 						$scope.Ingredients != null) {
@@ -111,6 +130,9 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 								ingredients.push(e.value);
 						});
 				}
+
+				// Generate a []string of the directions from the objects
+				// values.
 				var directions = new Array();
 				if ($scope.Directions != undefined &&
 						$scope.Directions != null) {
@@ -118,6 +140,8 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 								directions.push(e.value);
 						});
 				}
+
+				// Set the recipes lists to the lists we just made.
 				$scope.recipe.Ingredients = ingredients;
 				$scope.recipe.Directions = directions;
 		};
@@ -127,7 +151,7 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 				$scope.recipe = l;
 				$scope.makeobj();
 
-				// Make the recipe sortable.
+				// Make the ingredients sortable.
 				$("#sortableIngredients")
 						.sortable({
 								handle: '.drag-icon',
@@ -136,7 +160,7 @@ function RecipesViewCtrl($scope, $routeParams, $timeout, $location, Recipes, Lis
 								}
 						});
 
-				// Make the recipe sortable.
+				// Make the directions sortable.
 				$("#sortableDirections")
 						.sortable({
 								handle: '.drag-icon',

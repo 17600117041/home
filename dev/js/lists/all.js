@@ -6,14 +6,15 @@
 
 // ListsCtrl is the controller for viewing all lists.
 function ListsAllCtrl($scope, $location, Lists) {
-		// This handles clicking the copy button. Prepares the key to be
-		// copied and the new name.
+		// setcopy handles clicking the copy button. It prepares the key
+		// to be copied and the new name.
 		$scope.setcopy = function(key, name) {
 				$scope.copyKey = key;
 				$scope.copyName = "Copy of " + name;
 		};
 
-		// This function actually makes the copy of the list.
+		// copy actually makes the copy of the list and redirects to the
+		// new list.
 		$scope.copy = function() {
 				Lists.get($scope.copyKey, function(l) {
 						l.Name = $scope.copyName;
@@ -23,22 +24,21 @@ function ListsAllCtrl($scope, $location, Lists) {
 				});
 		};
 		
-		// This function prepare the delete values that might be used if
-		// the user verifies they want to delete an item.
+		// del prepare the delete values that might be used if the user
+		// verifies they want to delete an item.
 		$scope.del = function(index, key) {
 				$scope.delIndex = index;
 				$scope.delKey = key;
 		};
 		
-		// This function performs the actual delete.
+		// sure performs the actual delete.
 		$scope.sure = function() {
 				Lists.del($scope.delKey, function() {
 						$scope.lists.splice($scope.delIndex, 1);
 				});
 		};
 		
-		// This creates the new list and redirects you to 
-		// that list.
+		// save creates the new list and redirects to that list.
 		$scope.save = function() {
 				Lists.create({"Name": $scope.name}, function (l) {
 						$location.path('/lists/view/' + l.Key + '/');

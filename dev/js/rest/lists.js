@@ -4,9 +4,9 @@
  LICENSE file.
  */
 
-/* This is an interface to the RESTful List service. We have 
- * to use a service here because go and angular don't play nicely 
- * together with trailing slashes. 
+/* ListsService is an interface to the RESTful List service. We have
+ * to use a service here because go and angular don't play nicely
+ * together with trailing slashes.
  */
 function ListsService($http, Alerts) {
 		// Note: All of these functions accept callback
