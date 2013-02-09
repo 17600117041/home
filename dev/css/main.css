@@ -1,0 +1,51 @@
+/*
+	Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
+	source code is governed by a BSD-style license that can be found in
+	the LICENSE file.
+*/
+
+body {
+		/* We add the padding for the fixed header. */
+		padding-top: 60px;
+}
+
+.all-scroll-cursor {
+		cursor: all-scroll;
+}
+
+.pointer-cursor {
+		cursor: pointer;
+}
+
+/* This is the style of a completed list item. */
+.done-true {
+		text-decoration: line-through;
+		color: grey;
+}
+
+/* To enable sorting, we use a list instead of a table, so we
+implement the table striping for lists. */
+.list-striped > li {
+		padding: 8px; 
+		border-top: 1px solid #dddddd; 
+}
+
+.list-striped li:nth-child(odd) {
+		background-color: #f9f9f9;
+}
+
+/* This is used to make a reasonable amount of space between the forms
+and buttons and the list items. */
+.pad-bottom { 
+		padding-bottom: 15px;
+}
+
+/* The text box is slightly off, so we move it up a bit. */
+.editing-item {
+		margin-top: -5px;
+}
+
+/* The drag icon is slightly off, so we move it up a bit. */
+.drag-icon {
+		margin-top: -5px;
+}

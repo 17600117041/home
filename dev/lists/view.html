@@ -1,0 +1,150 @@
+<!--
+		Copyright 2013 Joshua Marsh. All rights reserved.
+		Use of this source code is governed by a BSD-style
+		license that can be found in the LICENSE file.
+	-->
+<div class="row">
+	<div class="span6 offset3">
+		<h1 class="pointer-cursor"
+				data-ng-click="edit(-2, $event)" data-ng-hide="editing == -2">{{list.Name}}</h1>
+		<!-- This is the edit field that will show up when the name is clicked. -->
+		<input data-ng-click="noclick($event)" 
+					 data-ng-hasfocus="editing == -2"
+					 class="editing-item" data-ng-show="editing == -2"
+					 type="text" data-ng-model="list.Name">
+
+		<div class="clearfix">
+			<!-- The table header with buttons. -->
+			<div class="pad-bottom pull-right">
+				<a role="button" class="btn btn-warning" 
+					 href="#cleanModal" data-toggle="modal">
+					<i class="icon-trash icon-white"></i>
+					Clean
+				</a>
+				<button role="button" class="btn" 
+					 data-toggle="modal"
+					 href="#updateModal"
+					 data-ng-class="{'btn-danger': updatable}"
+					 data-ng-disabled="!updatable">
+					<i class="icon-refresh"
+						 data-ng-class="{'icon-white': updatable}"></i>
+					Update
+				</button>
+				<button class="btn" 
+					 data-ng-class="{'btn-success': dirty}"
+					 data-ng-disabled="!dirty"
+					 data-ng-click="save()">
+					<i class="icon-hdd"
+						 data-ng-class="{'icon-white': dirty}"
+						 ></i>
+					Save
+				</button>
+			</div>
+			<div class="pad-bottom pull-left">
+				<form name="addForm" class="form-inline"> 
+					<div class="control-group pull-left"
+							 data-ng-class="{error: addForm.newitem.$invalid}">
+						<input id="newitem" name="newitem" placeholder="Add an item"
+									 type="text" data-ng-model="newitem" required>
+					</div>
+					<div class="pull-left">&nbsp;</div>
+					<button class="btn btn-primary pull-left" data-ng-click="add()"
+									data-ng-disabled="addForm.$invalid">
+						<i class="icon-plus icon-white"></i>
+						Add
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="span6 offset3">
+		<div data-ng-show="list.Items.length > 0">
+			<ul class="unstyled list-striped" id="sortablelist">
+				<li id="list-item-{{$index}}"
+						data-ng-repeat="item in list.Items | filter:noshow">
+					<div class="pull-right btn btn-info drag-icon">
+						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
+					</div>
+					<div class="checkbox">
+						<input type="checkbox" data-ng-change="dirtify()" 
+									 data-ng-model="item.Completed">
+						<div class="done-{{item.Completed}}">
+							<!-- This is the text box that will show up when the
+							item is clicked. -->
+							<input id="editing-item-{{$index}}"
+										 data-ng-hasfocus="editing == $index"
+										 class="editing-item" data-ng-show="editing == $index"
+										 type="text" data-ng-model="item.Name">
+							<span id="viewing-item-{{$index}}" data-ng-show="editing != $index"
+										class="viewing-item"
+										data-ng-click="edit($index)">
+								{{item.Name}}
+							</span>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div data-ng-hide="list.Items.length > 0">
+			<ul class="unstyled list-striped">
+				<li>
+					There are no items.
+				</li>
+		</div>
+	</div>
+</div>
+
+<!-- This is the popup box that shows when the update button is
+clicked but there local changes. -->
+<div id="updateModal" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>You have unsaved changes!</h3>
+  </div>
+  <div class="modal-body">
+    <p>You have unsaved changes. What would you like to do?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">
+			<i class="icon-remove-sign"></i>
+			Cancel
+		</button>
+		<button class="btn btn-danger"
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="overwrite()">
+			<i class="icon-remove icon-white"></i>
+			Overwrite
+		</button>
+		<button class="btn btn-info" 
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="merge()">
+			<i class="icon-tasks icon-white"></i>
+			Merge
+		</button>
+  </div>
+</div>
+
+<!-- This is the popup box that shows when the clean button is clicked. -->
+<div id="cleanModal" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Are You Sure?</h3>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to clean up completed items in this list?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">
+			<i class="icon-remove-sign"></i>
+			Cancel
+		</button>
+		<button class="pull-right btn btn-warning" 
+						data-dismiss="modal" aria-hidden="true" 
+						data-ng-click="sure()">
+			<i class="icon-trash icon-white"></i>
+			Clean
+		</button>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-ng-app="home">
+	<head>
+		<!--
+				Copyright 2013 Joshua Marsh. All rights reserved.
+				Use of this source code is governed by a BSD-style
+				license that can be found in the LICENSE file.
+			-->
+		<meta charset="utf-8">
+		<title>Home</title>
+		<meta name="description" content="List App">
+		<meta name="author" content="Joshua Marsh">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="shortcut icon" href="/favicon.ico" />
+
+		<!--[if lt IE 9]>
+				<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+				<![endif]-->
+
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap.min.css" 
+					rel="stylesheet">
+
+		<!-- APP CSS -->
+		<link href="/css/main.css" rel="stylesheet">
+		<!-- APP CSS -->
+
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-responsive.min.css" 
+					rel="stylesheet">
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+
+		<!-- APP JS -->
+		<script src="/js/rest/alerts.js"></script>
+		<script src="/js/rest/lists.js"></script>
+		<script src="/js/rest/recipes.js"></script>
+		<script src="/js/rest/user.js"></script>
+		<script src="/js/rest/rest.js"></script>
+		<script src="/js/routing.js"></script>
+		<script src="/js/alerts.js"></script>
+		<script src="/js/user.js"></script>
+		<script src="/js/lists/all.js"></script>
+		<script src="/js/lists/view.js"></script>
+		<script src="/js/recipes/all.js"></script>
+		<script src="/js/recipes/view.js"></script>
+		<script src="/js/date.js"></script>
+		<script src="/js/touch-punch.min.js"></script>
+		<!-- APP JS -->
+
+		<script async src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<script async src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="#/">
+							Home
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li>
+									<a href="#/lists/">
+										<i class="icon-list icon-white"></i>
+										Lists
+									</a>
+								</li>
+								<li class="divider-vertical"></li>
+								<li>
+									<a href="#/recipes/">
+										<i class="icon-book icon-white"></i>
+										Recipes
+									</a>
+								</li>
+								<li class="divider-vertical"></li>
+							</ul>
+							<p class="navbar-text pull-right" data-ng-controller="UserCtrl">
+								Hello, {{user.Email}}! 
+								<a href="{{user.LogoutURL}}">Logout</a>
+							</p>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			<!-- This is where the alerts pop up. -->
+			<div data-ng-controller="AlertsCtrl">
+				<div class="row">
+					<div class="span6 offset3">
+						<div data-ng-repeat="alert in alerts" class="alert" 
+								 data-ng-class="{'': alert.type == 'warning', 
+																'alert-success': alert.type == 'success', 
+																'alert-info': alert.type == 'info',
+																'alert-error': alert.type == 'error'}">
+							<button type="button" class="close" data-dismiss="alert" 
+											data-ng-click="remove($index)">&times;</button>
+							<strong>{{alert.strong}}</strong> {{alert.message}}
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- The main content of the page. -->
+			<div data-ng-view></div>
+		</div>
+
+		<!-- EMBED HERE -->
+
+	</body>
+</html>

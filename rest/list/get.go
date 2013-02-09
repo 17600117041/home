@@ -1,11 +1,19 @@
+// Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
+// source code is governed by a BSD-style license that can be found in
+// the LICENSE file.
+
 package list
 
 import (
 	"appengine"
 	"appengine/datastore"
+	"appengine/memcache"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/icub3d/gorca"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 // GetAllLists fetches all of the lists.
@@ -17,62 +25,112 @@ func GetAllLists(w http.ResponseWriter, r *http.Request) {
 	// Fetch the lists. 
 	lists := []List{}
 	if _, err := q.GetAll(c, &lists); err != nil {
-		gorca.LogAndUnexpected(w, r, err)
+		gorca.LogAndUnexpected(c, w, r, err)
 		return
 	}
 
 	// Write the lists as JSON.
-	gorca.WriteJSON(w, r, lists)
+	gorca.WriteJSON(c, w, r, lists)
 }
 
-// GetList fetches the list for the given tag. The currently
-// logged in user must own the list or the list must have been shared
-// with the user. Otherwise, an unauthorized error is returned.
+// GetList fetches the list for the given tag.
 func GetList(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+
 	// Get the Key.
 	vars := mux.Vars(r)
 	key := vars["key"]
 
-	l, _, ok := getListHelper(w, r, key)
+	// Handle Not-modified
+	ut := r.FormValue("date")
+	if ut != "" {
+		notmod(c, w, r, key, ut)
+		return
+	}
+
+	l, ok := GetListHelper(c, w, r, key)
 	if !ok {
 		return
 	}
 
+	// Save the results to memcache.
+	item := &memcache.Item{
+		Key:   key,
+		Value: []byte(fmt.Sprintf("%d", l.LastModified.Unix())),
+	}
+	if err := memcache.Set(c, item); err != nil {
+		gorca.Log(c, r, "error", "failed to set memcache: %v", err)
+	}
+
 	// Write the lists as JSON.
-	gorca.WriteJSON(w, r, l)
+	gorca.WriteJSON(c, w, r, l)
 }
 
-// getListHelper is a helper function that retrieves a list and it's
-// items from the datastore. If a failure occured, false is returned
-// and a response was returned to the request. This case should be
-// terminal.
-func getListHelper(w http.ResponseWriter, r *http.Request, key string) (*List, *datastore.Key, bool) {
-	// Get the context.
-	c := appengine.NewContext(r)
+// notmod checks to see if the cached date for the key is newer than
+// the date given from the url. This call is terminal. It will always
+// respond to the request. If the dates are equal, then this function
+// sends a 304 Not Modified. If an error occurs, the error is logged
+// and sent back.
+func notmod(c appengine.Context, w http.ResponseWriter,
+	r *http.Request, key string, date string) {
 
-	// Decode the string version of the key.
-	k, err := datastore.DecodeKey(key)
+	// Convert the given string.
+	i, err := strconv.ParseInt(date, 10, 64)
 	if err != nil {
-		gorca.LogAndUnexpected(w, r, err)
-		return nil, nil, false
+		gorca.LogAndFailed(c, w, r, err)
+		return
+	}
+	t := time.Unix(i, 0)
+
+	// Try to get the key from memcache
+	item, err := memcache.Get(c, key)
+	if err != nil && err != memcache.ErrCacheMiss {
+		gorca.LogAndFailed(c, w, r, err)
+		return
 	}
 
-	// Get the list by key.
-	var l List
-	if err := datastore.Get(c, k, &l); err != nil {
-		gorca.LogAndNotFound(w, r, err)
-		return nil, nil, false
+	var mt time.Time
+
+	// Check to see if it's simply not there.
+	if err == memcache.ErrCacheMiss {
+		gorca.Log(c, r, "info", "failed to get memcache: %s", key)
+
+		// Try to get the list.
+		l, ok := GetListHelper(c, w, r, key)
+		if !ok {
+			return
+		}
+
+		// Save the results to memcache.
+		item := &memcache.Item{
+			Key:   key,
+			Value: []byte(fmt.Sprintf("%d", l.LastModified.Unix())),
+		}
+		if err := memcache.Set(c, item); err != nil {
+			gorca.Log(c, r, "error", "failed to set memcache: %v", err)
+		}
+
+		mt = l.LastModified
+	} else {
+		// Convert the memcache string.
+		mi, err := strconv.ParseInt(string(item.Value), 10, 64)
+		if err != nil {
+			gorca.LogAndFailed(c, w, r, err)
+			return
+		}
+
+		mt = time.Unix(mi, 0)
+
 	}
 
-	// Get all of the items for the list.
-	var li ItemsList
-	q := datastore.NewQuery("Item").Ancestor(k).Order("Order")
-	if _, err := q.GetAll(c, &li); err != nil {
-		gorca.LogAndUnexpected(w, r, err)
-		return nil, nil, false
+	if mt.Equal(t) {
+		// Write out the not modified.
+		w.WriteHeader(http.StatusNotModified)
+		return
 	}
 
-	l.Items = li
-
-	return &l, k, true
+	// Write out that we modified.
+	gorca.WriteMessage(c, w, r, "success", "Modified.",
+		http.StatusOK)
+	return
 }

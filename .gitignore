@@ -6,6 +6,7 @@
 # Folders
 _obj
 _test
+prod
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -34,3 +35,6 @@ tramp
 # Org-mode
 .org-id-locations
 *_archive
+
+# We don't want app.yaml. It's a link that is picked during dev/prod.
+app.yaml
