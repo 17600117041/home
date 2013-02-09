@@ -40,11 +40,7 @@ func PostList(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// PutList saves the list for the given tag. The currently logged in
-// user must own the list or the list must have been shared with the
-// user. Otherwise, an unauthorized error is returned. Additionally,
-// if the user is not the owner, only the items in the list can be
-// modified.
+// PutList saves the list for the given tag.
 func PutList(w http.ResponseWriter, r *http.Request) {
 	// Get the context.
 	c := appengine.NewContext(r)
