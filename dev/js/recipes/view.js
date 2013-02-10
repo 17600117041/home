@@ -67,8 +67,8 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 				});
 		};
 
-		// delete removes the given item from the list.
-		$scope.delete = function(type, index) {
+		// del removes the given item from the list.
+		$scope.del = function(type, index) {
 				$scope[type].splice(index, 1);
 				$scope.dirty = true;
 		};
