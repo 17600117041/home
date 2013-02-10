@@ -6,10 +6,13 @@
 <div class="row">
 	<div class="span6 offset3">
 		<h1 class="pointer-cursor"
-				data-ng-click="edit('title', -2)" data-ng-hide="editing == -2">{{recipe.Name}}</h1>
+				data-ng-click="edit(-2, 'title')" 
+				data-ng-hide="editing == -2 && editingtype == 'title'">
+			{{recipe.Name}}
+		</h1>
 		<!-- This is the edit field that will show up when the name is clicked. -->
-		<input data-ng-hasfocus="editing == -2"
-					 class="editing-item" data-ng-show="editing == -2"
+		<input data-ng-hasfocus="editing == -2 && editingtype == 'title'"
+					 class="editing-item" data-ng-show="editing == -2 && editingtype == 'title'"
 					 type="text" data-ng-model="recipe.Name">
 
 		<div class="clearfix">
@@ -26,6 +29,12 @@
 						 ></i>
 					Add To List
 				</a>
+				<button class="btn" 
+					 data-ng-class="{'btn-danger': !cleanup, 'btn-warning': cleanup}"
+					 data-ng-click="togglecleanup()">
+					<i class="icon-trash icon-white" ></i>
+					Cleanup
+				</button>
 				<button class="btn" 
 					 data-ng-class="{'btn-success': dirty}"
 					 data-ng-disabled="!dirty"
@@ -51,6 +60,12 @@
 					<div class="pull-right btn btn-info drag-icon">
 						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 					</div>
+					<div class="pull-right">&nbsp;</div>
+					<button class="btn btn-danger pull-right remove-icon"
+									data-ng-show="cleanup"
+									data-ng-click="delete('Ingredients', $index)">
+						<i class="icon-remove icon-white"></i>
+					</button>
 					<div>
 						<!-- This is the text box that will show up when the
 								 item is clicked. -->
@@ -69,20 +84,20 @@
 				</div>
 			</li>
 		</ul>
-		<ul class="unstyled">
+		<ul class="unstyled padding8">
 			<li>
 				<form name="addIngredientForm" class="form-inline"> 
 					<div class="control-group"
 							 data-ng-class="{error: addIngredientForm.newingredient.$invalid}">
-						<input class="input-block-level" id="newingredient" 
+						<input id="newingredient" class="input-large"
 									 name="newingredient" placeholder="Add an ingedient"
 									 type="text" data-ng-model="toadd['Ingredients']" required>
+						<button class="add-ingredient-button pull-right btn btn-primary" 
+								 data-ng-click="add('Ingredients')"
+								 data-ng-disabled="addIngredientForm.$invalid">
+							<i class="icon-plus icon-white"></i> Add
+						</button>
 					</div>
-					<button class="btn btn-primary pull-right" data-ng-click="add('Ingredients')"
-									data-ng-disabled="addIngredientForm.$invalid">
-						<i class="icon-plus icon-white"></i>
-						Add
-					</button>
 				</form>
 			</li>
 		</ul>
@@ -98,14 +113,20 @@
 					<div class="pull-right btn btn-info drag-icon">
 						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 					</div>
+					<div class="pull-right">&nbsp;</div>
+					<button class="btn btn-danger pull-right remove-icon"
+									data-ng-show="cleanup"
+									data-ng-click="delete('Directions', $index)">
+						<i class="icon-remove icon-white"></i>
+					</button>
 					<div>
 						<!-- This is the text box that will show up when the
 								 item is clicked. -->
-						<input id="editing-direction-{{$index}}"
-									 data-ng-hasfocus="editing == $index && editingtype == 'direction'"
-									 data-ng-show="editing == $index && editingtype == 'direction'"
-									 class="editing-item" 
-									 type="text" data-ng-model="direction.value">
+						<textarea id="editing-direction-{{$index}}"
+											data-ng-hasfocus="editing == $index && editingtype == 'direction'"
+											data-ng-show="editing == $index && editingtype == 'direction'"
+											class="editing-item" 
+											type="text" data-ng-model="direction.value"></textarea>
 						<span id="viewing-direction-{{$index}}" 
 									data-ng-hide="editing == $index && editingtype == 'direction'"
 									class="viewing-item"
@@ -116,13 +137,14 @@
 				</div>
 			</li>
 		</ul>
-		<ul class="unstyled">
+		<ul class="unstyled padding8">
 			<li>
 				<form name="addDirectionForm" class="form-inline"> 
 					<div class="control-group"
 							 data-ng-class="{error: addDirectionForm.newdirection.$invalid}">
-						<textarea class="input-block-level" id="newdirection" name="newdirection" placeholder="Add a direction"
-									 data-ng-model="toadd['Directions']" required></textarea>
+						<textarea class="input-block-level" id="newdirection" 
+											name="newdirection" placeholder="Add a direction"
+											data-ng-model="toadd['Directions']" required></textarea>
 					</div>
 					<button class="btn btn-primary pull-right" data-ng-click="add('Directions')"
 									data-ng-disabled="addDirectionForm.$invalid">

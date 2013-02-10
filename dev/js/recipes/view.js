@@ -67,6 +67,11 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 				});
 		};
 
+		// delete removes the given item from the list.
+		$scope.delete = function(type, index) {
+				$scope[type].splice(index, 1);
+				$scope.dirty = true;
+		};
 
 		// Save saves changes to the recipe back to the datastore.
 		$scope.save = function() {
@@ -170,9 +175,15 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 						});
 		});
 
+
+		$scope.togglecleanup = function() {
+				$scope.cleanup = !$scope.cleanup;
+		};
+
 		// We start out not editing any recipe.
 		$scope.editingtype = "";
 		$scope.editing = -1;
+		$scope.cleanup = false;
 
 		// The recipe should start clean.
 		$scope.dirty = false;
@@ -180,5 +191,12 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 				"Ingredients": "",
 				"Directions": ""
 		};
+
+		// Add shit+enter to save for the direction box.
+		$('#newdirection').on('keyup', function (event) {
+				if (event.which == 13 && event.shiftKey) {
+						$scope.$apply($scope.add('Directions'));
+				}
+		});
 }
 RecipesViewCtrl.$inject = ['$scope', '$routeParams', '$timeout', '$location', 'Recipes', 'Lists'];
