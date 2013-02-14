@@ -18,7 +18,7 @@
 		<div class="clearfix">
 			<!-- The table header with buttons. -->
 			<div class="pad-bottom pull-right">
-				<a role="button" class="btn" 
+				<button role="button" class="btn" 
 					 href="#copyModal"
 					 data-toggle="modal"
 					 data-ng-click="getlists()"
@@ -28,7 +28,7 @@
 						 data-ng-class="{'icon-white': !dirty}"
 						 ></i>
 					Add To List
-				</a>
+				</button>
 				<button class="btn" 
 								data-ng-class="{'btn-danger': !cleanup, 'btn-warning': cleanup}"
 								data-ng-click="togglecleanup()">
