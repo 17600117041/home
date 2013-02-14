@@ -158,6 +158,33 @@
 </div>
 
 <!-- This is the modal that pops up when the copy button is
+pressed. -->
+<form name="copylist">
+	<div data-modal 
+			 data-modal-id="copyModal"
+			 data-modal-title="Copy Ingredients To List"
+			 data-modal-message="Copy the ingredients to a list."
+			 data-modal-ok-button-class="btn-primary"
+			 data-modal-ok-button-text="Copy"
+			 data-modal-ok-button-icon="icon-file icon-white"
+			 data-modal-data="data"
+			 data-modal-form="copylist"
+			 data-modal-on-ok="copy()">
+			<div class="control-group"
+					 data-ng-class="{error: copylist.copyName.$invalid}">
+				<label>List</label>
+				<select name="copyList" data-ng-model="data.list" 
+								data-ng-options="l.Name for l in data.lists" required>
+				</select>
+				<span data-ng-show="copylist.copyName.$error.required" 
+							class="help-inline">
+					Required
+				</span>
+			</div>
+	</div>
+</form>
+
+<!-- This is the modal that pops up when the copy button is
 		 pressed. -->
 <div id="copyModal" class="modal hide">
   <div class="modal-header">
@@ -167,17 +194,6 @@
   </div>
   <div class="modal-body">
 		<form name="copylist">
-			<div class="control-group"
-					 data-ng-class="{error: copylist.copyName.$invalid}">
-				<label>List</label>
-				<select name="copyList" data-ng-model="copyList" 
-								data-ng-options="l.Name for l in lists" required>
-				</select>
-				<span data-ng-show="copylist.copyName.$error.required" 
-							class="help-inline">
-					Required
-				</span>
-			</div>
 		</form>
   </div>
   <div class="modal-footer">

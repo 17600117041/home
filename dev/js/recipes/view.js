@@ -46,23 +46,23 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 		// modal.
 		$scope.getlists = function() {
 				Lists.getall(function (lists) {
-						$scope.lists = lists;
+						$scope.data.lists = lists;
 				});
 		};
 
 		// copy makes a copy of each of the ingredients and push it onto
 		// the list. It then save the list.
 		$scope.copy = function() {
-				$scope.copyList.Items = new Array();
+				$scope.data.list.Items = new Array();
 				$scope.Ingredients.forEach(function(e, i, a) {
-						$scope.copyList.Items.push({
+						$scope.data.list.Items.push({
 								Name: e.value,
 								Completed: false,
 								Delete: false
 						});
 				});
 
-				Lists.save($scope.copyList, function(data) {
+				Lists.save($scope.data.list, function(data) {
 						$location.path('/lists/view/' + data.Key + '/');
 				});
 		};
@@ -198,5 +198,7 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 						$scope.$apply($scope.add('Directions'));
 				}
 		});
+
+		$scope.data = {};
 }
 RecipesViewCtrl.$inject = ['$scope', '$routeParams', '$timeout', '$location', 'Recipes', 'Lists'];
