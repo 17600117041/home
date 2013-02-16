@@ -130,9 +130,6 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 															 });
 						 });
 
-		// Start out with cursor in the add text box.
-		$('#newitem').focus();
-
 		// We start out not editing any list.
 		$scope.editing = -1;
 

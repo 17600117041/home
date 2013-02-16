@@ -46,6 +46,11 @@ and buttons and the list items. */
 }
 
 /* The drag icon is slightly off, so we move it up a bit. */
-.drag-icon {
+.drag-icon, .remove-icon {
 		margin-top: -5px;
+}
+
+/* This is used to align the add button with the other buttons on the recipe page. */
+.padding8 {
+		padding: 8px; 
 }

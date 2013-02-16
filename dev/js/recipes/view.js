@@ -46,27 +46,32 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 		// modal.
 		$scope.getlists = function() {
 				Lists.getall(function (lists) {
-						$scope.lists = lists;
+						$scope.data.lists = lists;
 				});
 		};
 
 		// copy makes a copy of each of the ingredients and push it onto
 		// the list. It then save the list.
 		$scope.copy = function() {
-				$scope.copyList.Items = new Array();
+				$scope.data.list.Items = new Array();
 				$scope.Ingredients.forEach(function(e, i, a) {
-						$scope.copyList.Items.push({
+						$scope.data.list.Items.push({
 								Name: e.value,
 								Completed: false,
 								Delete: false
 						});
 				});
 
-				Lists.save($scope.copyList, function(data) {
+				Lists.save($scope.data.list, function(data) {
 						$location.path('/lists/view/' + data.Key + '/');
 				});
 		};
 
+		// del removes the given item from the list.
+		$scope.del = function(type, index) {
+				$scope[type].splice(index, 1);
+				$scope.dirty = true;
+		};
 
 		// Save saves changes to the recipe back to the datastore.
 		$scope.save = function() {
@@ -170,9 +175,15 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 						});
 		});
 
+
+		$scope.togglecleanup = function() {
+				$scope.cleanup = !$scope.cleanup;
+		};
+
 		// We start out not editing any recipe.
 		$scope.editingtype = "";
 		$scope.editing = -1;
+		$scope.cleanup = false;
 
 		// The recipe should start clean.
 		$scope.dirty = false;
@@ -180,5 +191,14 @@ function RecipesViewCtrl($scope, $routeParams, $timeout,
 				"Ingredients": "",
 				"Directions": ""
 		};
+
+		// Add shit+enter to save for the direction box.
+		$('#newdirection').on('keyup', function (event) {
+				if (event.which == 13 && event.shiftKey) {
+						$scope.$apply($scope.add('Directions'));
+				}
+		});
+
+		$scope.data = {};
 }
 RecipesViewCtrl.$inject = ['$scope', '$routeParams', '$timeout', '$location', 'Recipes', 'Lists'];
