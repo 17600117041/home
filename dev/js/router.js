@@ -9,19 +9,19 @@ function Router($routeProvider) {
 		$routeProvider
 				.when('/lists/', {
 						controller:ListsAllCtrl, 
-						templateUrl: 'lists/all.html'
+						templateUrl: 'partials/lists/all.html'
 				})
 				.when('/lists/view/:id', {
 						controller:ListsViewCtrl, 
-						templateUrl: 'lists/view.html'
+						templateUrl: 'partials/lists/view.html'
 				})
 				.when('/recipes/', {
 						controller:RecipesAllCtrl, 
-						templateUrl: 'recipes/all.html'
+						templateUrl: 'partials/recipes/all.html'
 				})
 				.when('/recipes/view/:id', {
 						controller:RecipesViewCtrl, 
-						templateUrl: 'recipes/view.html'
+						templateUrl: 'partials/recipes/view.html'
 				})
 				.otherwise({redirectTo: '/lists/'});
 }

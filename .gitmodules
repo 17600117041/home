@@ -1,3 +1,3 @@
-[submodule "dev/js/jsplus"]
-	path = dev/js/jsplus
+[submodule "dev/jsplus"]
+	path = dev/jsplus
 	url = git@github.com:icub3d/jsplus.git
