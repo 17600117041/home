@@ -91,6 +91,10 @@ func (l *List) Merge(m *List) []string {
 	del := []string{}
 
 	for _, r := range m.Items {
+		if r.Delete && r.Key == "" {
+			continue
+		}
+
 		// Get the accompanying list item.
 		s := l.RemoveItem(r.Key)
 
