@@ -25,15 +25,14 @@
 					 data-ng-class="{'btn-primary': !dirty}"
 					 data-ng-disabled="dirty">
 					<i class="icon-plus"
-						 data-ng-class="{'icon-white': !dirty}"
-						 ></i>
+						 data-ng-class="{'icon-white': !dirty}"></i>
 					Add To List
 				</button>
 				<button class="btn" 
-								data-ng-class="{'btn-danger': !cleanup, 'btn-warning': cleanup}"
+								data-ng-class="{'btn-warning': !cleanup, 'btn-danger': cleanup}"
 								data-ng-click="togglecleanup()">
-					<i class="icon-trash icon-white" ></i>
-					Cleanup
+					<i class="icon-edit icon-white" ></i>
+					Edit
 				</button>
 				<button class="btn" 
 								data-ng-class="{'btn-success': dirty}"
@@ -57,10 +56,11 @@
 			<li id="recipe-Ingredients-{{$index}}"
 					data-ng-repeat="ingredient in Ingredients">
 				<div>
-					<div class="pull-right btn btn-info drag-icon">
+					<div data-ng-show="cleanup"
+							 class="pull-right btn btn-info drag-icon">
 						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 					</div>
-					<div class="pull-right">&nbsp;</div>
+					<div data-ng-show="cleanup" class="pull-right">&nbsp;</div>
 					<button class="btn btn-danger pull-right remove-icon"
 									data-ng-show="cleanup"
 									data-ng-click="del('Ingredients', $index)">
@@ -110,10 +110,10 @@
 			<li id="recipe-Directions-{{$index}}"
 					data-ng-repeat="direction in Directions">
 				<div>
-					<div class="pull-right btn btn-info drag-icon">
+					<div data-ng-show="cleanup" class="pull-right btn btn-info drag-icon">
 						<i class="all-scroll-cursor icon-align-justify icon-white"></i>
 					</div>
-					<div class="pull-right">&nbsp;</div>
+					<div data-ng-show="cleanup" class="pull-right">&nbsp;</div>
 					<button class="btn btn-danger pull-right remove-icon"
 									data-ng-show="cleanup"
 									data-ng-click="del('Directions', $index)">

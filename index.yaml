@@ -19,3 +19,8 @@ indexes:
   ancestor: yes
   properties:
   - name: LastModified
+
+- kind: Recipe
+  ancestor: yes
+  properties:
+  - name: Name
