@@ -76,6 +76,30 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				$scope.newitem = "";
 		};
 
+		// pluralize attempts to add the pluralization at the end of a word (s or es).
+		$scope.pluralize = function(e) {
+				if(/^ +$/.test(e)) return e;
+
+				if (/s$/.test(e))
+						return e + "es";
+						
+				return e + "s";
+		};
+
+		// depluralize attempts to remove the pluralization at the end of a word (s or es).
+		$scope.depluralize = function(e) {
+				if (/[^aeiou]es$/.test(e))
+						return e.replace(/s$/, '');
+
+				e = e.trim().replace(/es$/, '');
+				if (/s$/.test(e)) {
+						if (!/[aeious]s$/.test(e)) {
+								e = e.replace(/s$/, '');
+						}
+				}
+				
+				return e;
+		};
 
 		// split parses the given string and returns the parts of the
 		// string: quantity, unit, and name. For example, '1 cup butter'
@@ -89,12 +113,14 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				// These are our states in the state machine.
 				var QTY = 1, UNIT = 2, NAME = 3, MODIFIERS = 4, INPAREN = 5;
 				var state = QTY, prev = 0;
+				var plus = true;
 
 				// These are the arrays we'll be storing information in.
 				var qty = [];
 				var units = [];
 				var name = [];
 				var modifiers = [];
+				
 
 				// Loop through each chunk.
 				for (var x = 0; x < chunks.length; x++) {
@@ -102,7 +128,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						var e = chunks[x].replace(/[\.,]$/, '');
 
 						// If it's an empty string, ignore it.
-						if (e == "") continue;
+						if (/^\s*$/.test(e)) continue;
 
 						// First check to the paren states.
 						if (state == INPAREN) {
@@ -136,7 +162,8 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 								} else if (e == "+" || e == "plus") {
 										// There is another quantity and unit, so we
 										// should start over.
-										units.push('');
+										units.push('>!<');
+										plus = true;
 										continue;
 								} else {
 										state = UNIT;
@@ -147,13 +174,27 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						// current value through to here.
 						if (state == UNIT) {
 								if ($.inArray(e, window.Units) > -1) {
-										units.push(e);
+										units.push($scope.depluralize(e));
+										plus = false;
 										continue;
-								} else if (e == "+" || e == "plus") {
+								} 
+
+								// Add the last unit again if we aren't equal.
+								if (qty.length > units.length) {
+										if (units.length == 0 || plus) {
+												units.push('>!<');
+												plus = false;
+										}	else {
+												units.push(units[units.length-1]);
+										}
+								}
+
+								if (e == "+" || e == "plus") {
 										// There is another quantity and unit, so we
 										// should start over.
-										if (qty.length != units.length) qty.push('1');
+										if (qty.length < units.length) qty.push('1');
 										state = QTY;
+										plus = true;
 										continue;
 								} else {
 										state = MODIFIERS;
@@ -189,18 +230,15 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				var joinedname = modifiers.sort().join(', ') + " " + name.join(' ');
 
 				// Attempt to remove the end of the last word it it's pluralized.
-				joinedname = joinedname.trim().replace(/es$/, '');
-				if (/s$/.test(joinedname)) {
-						if (!/[aeious]s$/.test(joinedname)) {
-								joinedname = joinedname.replace(/s$/, '');
-						}
-				}
+				joinedname = $scope.depluralize(joinedname);
 
 				if (qty.length == 0)
 						qty.push("1");
 
 				if (units.length == 0)
-						units.push('');
+						units.push('>!<');
+
+				console.log(joinedname, qty, units);
 
 				return {
 						name: joinedname,
@@ -212,6 +250,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		// normalize attempts to combine the given quantities into a
 		// single quantity.
 		$scope.normalize = function(quantities) {
+				console.log(quantities);
 				var combined = {};
 				
 				for (var x = 0; x < quantities.length; x++) {
@@ -230,7 +269,16 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				// to convert them to the same single unit.
 				var total = "";
 				for (var unit in combined) {
-						total += combined[unit].toFixed(2) + " " + unit + " + ";
+						total += combined[unit].toFixed(2) + " ";
+						
+						if (unit != '>!<') {
+								if (combined[unit] > 1)
+										total += $scope.pluralize(unit);
+								else
+										total += unit;
+						}
+
+						total += " + ";
 				}
 
 				return total.replace(/ \+ $/, '').replace(/\.00/, '');
@@ -281,7 +329,13 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						var n = $scope.normalize(merged[name].quantities)
 								+ " " + name;
 						n = n.trim();
-						n = n.replace('/  /', ' ');
+						n = n.replace('/  /g', ' ')
+								.replace(/\.13/g, ' 1/8')
+								.replace(/\.25/g, ' 1/4')
+								.replace(/\.33/g, ' 1/3')
+								.replace(/\.50/g, ' 1/2')
+								.replace(/\.00/g, '')
+								.replace(/^0/, '');
 						$scope.list.Items[merged[name].index].Name = n;
 				}
 		};
