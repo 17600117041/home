@@ -4,8 +4,6 @@
  the LICENSE file.
  */
 
-var home = angular.module('home', ['rest']);
+var home = angular.module('home', ['rest', 'jsplus']);
 
 home.config(['$routeProvider', Router]);
-home.directive('ngHasfocus', HasFocus);
-home.directive('modal', Modal);
