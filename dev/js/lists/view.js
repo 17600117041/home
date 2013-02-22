@@ -335,6 +335,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 								.replace(/\.33/g, ' 1/3')
 								.replace(/\.50/g, ' 1/2')
 								.replace(/\.00/g, '')
+								.replace(/ 0 /g, ' ')
 								.replace(/^0/, '');
 						$scope.list.Items[merged[name].index].Name = n;
 				}

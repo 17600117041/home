@@ -54,7 +54,12 @@
 				'drained',
 				'defrosted',
 				'chopped',
-				'membranes'
+				'membranes',
+				'peeled',
+				'seeded',
+				'cut',
+				'for',
+				'sliced'
 				];
 
 
