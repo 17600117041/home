@@ -59,7 +59,12 @@
 				'cut',
 				'thin',
 				'for',
-				'sliced'
+				'sliced',
+				'sifted',
+				'softened',
+				'cold',
+				'boiling',
+				'warm'
 				];
 
 
