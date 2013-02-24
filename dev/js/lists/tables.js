@@ -50,7 +50,6 @@
 				'large',
 				'medium',
 				'rinsed',
-				'and',
 				'drained',
 				'defrosted',
 				'chopped',
@@ -58,6 +57,7 @@
 				'peeled',
 				'seeded',
 				'cut',
+				'thin',
 				'for',
 				'sliced'
 				];

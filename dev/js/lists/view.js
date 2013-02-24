@@ -334,6 +334,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 								.replace(/\.25/g, ' 1/4')
 								.replace(/\.33/g, ' 1/3')
 								.replace(/\.50/g, ' 1/2')
+								.replace(/\.75/g, ' 3/4')
 								.replace(/\.00/g, '')
 								.replace(/ 0 /g, ' ')
 								.replace(/^0/, '');
