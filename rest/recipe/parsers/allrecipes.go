@@ -44,47 +44,49 @@ func (a AllRecipesDotComParser) GetDirections(data []byte) []string {
 func (a AllRecipesDotComParser) GetIngredients(data []byte) []string {
 
 	// We can find the unordered list by classname.
-	re := regexp.MustCompile(`(?sU)<ul class="ingredient-wrap">.*</ul>`)
-	ul := re.Find(data)
-
-	// Each item in the list has a <p> tag with the ingredients.
-	re = regexp.MustCompile(`(?sU)<p class="fl-ing" itemprop="ingredients">.*</p>`)
-	ingredients := re.FindAll(ul, -1)
-
-	// These are the regular expressions that parse out the amount and
-	// name from the <p> ingredients.
-	reamt := regexp.MustCompile(`(?sU)<span id="lblIngAmount" class="ingredient-amount">(.*)</span>`)
-	rename := regexp.MustCompile(`(?sU)<span id="lblIngName" class="ingredient-name">(.*)</span>`)
+	re := regexp.MustCompile(`(?sU)<ul class="ingredient-wrap.*</ul>`)
+	uls := re.FindAll(data, -1)
 
 	list := []string{}
-	for _, ingredient := range ingredients {
-		amount := reamt.FindSubmatch(ingredient)
-		name := rename.FindSubmatch(ingredient)
+	for _, ul := range uls {
 
-		// This will eventuall be the entire item as a single string.
-		item := ""
+		// Each item in the list has a <p> tag with the ingredients.
+		re = regexp.MustCompile(`(?sU)<p class="fl-ing" itemprop="ingredients">.*</p>`)
+		ingredients := re.FindAll(ul, -1)
 
-		// Only add the amount if the submatch was found.
-		if len(amount) > 1 {
-			item = string(amount[1])
-		}
+		// These are the regular expressions that parse out the amount and
+		// name from the <p> ingredients.
+		reamt := regexp.MustCompile(`(?sU)<span id="lblIngAmount" class="ingredient-amount">(.*)</span>`)
+		rename := regexp.MustCompile(`(?sU)<span id="lblIngName" class="ingredient-name">(.*)</span>`)
 
-		// Only add the name if the submatch was found.
-		if len(name) > 1 {
-			// Add a space if we got an amount.
-			if item != "" {
-				item += " "
+		for _, ingredient := range ingredients {
+			amount := reamt.FindSubmatch(ingredient)
+			name := rename.FindSubmatch(ingredient)
+
+			// This will eventually be the entire item as a single string.
+			item := ""
+
+			// Only add the amount if the submatch was found.
+			if len(amount) > 1 {
+				item = string(amount[1])
 			}
 
-			// Append the name.
-			item += string(name[1])
-		}
+			// Only add the name if the submatch was found.
+			if len(name) > 1 {
+				// Add a space if we got an amount.
+				if item != "" {
+					item += " "
+				}
 
-		// Add the complete item.
-		if item != "" {
-			list = append(list, cleanField(item))
+				// Append the name.
+				item += string(name[1])
+			}
+
+			// Add the complete item.
+			if item != "" {
+				list = append(list, cleanField(item))
+			}
 		}
 	}
-
 	return list
 }
