@@ -15,6 +15,11 @@ indexes:
   properties:
   - name: Order
 
+- kind: Link
+  properties:
+  - name: Tags
+  - name: Name
+
 - kind: List
   ancestor: yes
   properties:

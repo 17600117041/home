@@ -1,0 +1,55 @@
+<!--
+		Copyright 2013 Joshua Marsh. All rights reserved.
+		Use of this source code is governed by a BSD-style
+		license that can be found in the LICENSE file.
+	-->
+<div class="row">
+	<div class="span6 offset3">
+		<h1>Links</h1>
+			<form class="form-search">
+				<input type="text" class="input-medium" data-ng-model="data.search">
+				<button class="btn btn-info" 
+								data-ng-click="search()">
+					<i class="icon-search icon-white"></i>
+					Search
+				</button>
+				<button class="btn btn-success" 
+								data-ng-click="create()">
+					<i class="icon-plus icon-white"></i>
+					New
+				</button>
+			</form>
+		<dl data-ng-repeat="link in links">
+			<dt>
+				<a href="{{link.Url}}">
+					<i data-ng-class="link.Icon"></i> {{link.Name}}
+				</a>
+				<a role="button" href="#deleteModal" class="btn btn-danger pull-right"
+					 data-ng-click="del($index, link.Key)"
+					 data-toggle="modal"><i class="icon-remove icon-white"></i>
+				</a>
+				<div class="pull-right">&nbsp;</div>
+				<a role="button" class="btn btn-warning pull-right"
+					 href="#/links/{{link.Key}}">
+					<i class="icon-edit icon-white"></i>
+				</a>
+			</dt>
+			<dd>{{link.Description}}</dd>
+		</dl>
+	</div>
+</div>
+
+	</div>
+</div>
+
+<!-- This is the modal that pops up when the delete button is
+pressed. -->
+<div data-modal 
+		 data-modal-id="deleteModal"
+		 data-modal-title="Are You Sure?"
+		 data-modal-message="Are you sure you want to delete this list?"
+		 data-modal-ok-button-class="btn-danger"
+		 data-modal-ok-button-text="Delete"
+		 data-modal-ok-button-icon="icon-remove icon-white"
+		 data-modal-on-ok="sure()"></div>
+		 

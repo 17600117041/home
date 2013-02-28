@@ -1,0 +1,19 @@
+<!--
+		Copyright 2013 Joshua Marsh. All rights reserved.
+		Use of this source code is governed by a BSD-style
+		license that can be found in the LICENSE file.
+	-->
+<div class="row">
+	<div class="span6 offset3">
+		<h1>Home</h1>
+		
+		<dl data-ng-repeat="link in links">
+			<dt>
+				<a href="{{link.Url}}">
+					<i data-ng-class="link.Icon"></i> {{link.Name}}
+				</a>
+			</dt>
+			<dd>{{link.Description}}</dd>
+		</dl>
+	</div>
+</div>

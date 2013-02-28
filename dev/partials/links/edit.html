@@ -1,0 +1,72 @@
+<!--
+		Copyright 2013 Joshua Marsh. All rights reserved.
+		Use of this source code is governed by a BSD-style
+		license that can be found in the LICENSE file.
+	-->
+<div class="row">
+	<div class="span6 offset3">
+		<form name="linkform">
+			<fieldset>
+				<div class="control-group">
+					<div class="controls">
+						<input type="url" id="URL" name="URL" placeholder="URL"
+									 data-ng-model="link.Url" required>
+						<span data-ng-show="linkform.URL.$error.required"
+									class="text-error">
+							Required
+						</span>
+						<span data-ng-show="linkform.URL.$error.url"
+									class="text-error">
+							Invalid URL
+						</span>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<input type="text" id="Name" name="Name" placeholder="Name"  
+									 data-ng-model="link.Name" required>
+						<span data-ng-show="linkform.Name.$error.required"
+									class="text-error">
+							Required
+						</span>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<input type="text" id="Icon" name="Icon" placeholder="Icon"
+									 data-ng-model="link.Icon">
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<input type="text" id="Tags" name="Tags" placeholder="Tags" data-ng-list="/ /"
+									 data-ng-model="link.Tags">
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<textarea id="Description" name="Description" placeholder="Description"  
+									 data-ng-model="link.Description">
+						</textarea>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-info" 
+										title="Back"
+										data-ng-click="back()">
+							<i class="icon-chevron-left icon-white"></i>
+							Back
+						</button>
+						<button class="btn btn-success" 
+										data-ng-disabled="!linkform.$valid"
+										data-ng-click="save()">
+							<i class="icon-hdd icon-white"></i>
+							Save
+						</button>
+					</div>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>
