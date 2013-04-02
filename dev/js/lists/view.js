@@ -1,26 +1,26 @@
 /*
-	Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
-	source code is governed by a BSD-style license that can be found in
-	the LICENSE file.
-*/
+ Copyright 2013 Joshua Marsh. All rights reserved.  Use of this
+ source code is governed by a BSD-style license that can be found in
+ the LICENSE file.
+ */
 
 // ListsViewCtrl is the controller for viewing and updating lists.
 function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 		// Cancel the update checks when we leave.
 		$scope.$on('$destroy', function() {
-									 $timeout.cancel($scope.timer);
-							 });
+				$timeout.cancel($scope.timer);
+		});
 
 		// Check for changes every 30 seconds.
 		$scope.checkupdate = function() {
 				Lists.checkupdate($scope.list, function(u) {
-														 $scope.updatable = u;
+						$scope.updatable = u;
 
-														 if ($scope.updatable && !$scope.dirty) {
-																 $scope.overwrite();
-														 }
-												 });
+						if ($scope.updatable && !$scope.dirty) {
+								$scope.overwrite();
+						}
+				});
 				$scope.timer = $timeout($scope.checkupdate, 30000);
 		};
 		$scope.timer = $timeout($scope.checkupdate, 30000);
@@ -36,8 +36,8 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		// and lose their changes.
 		$scope.overwrite = function() {
 				Lists.get($routeParams.id, function(l) {
-										 $scope.list = l;
-								 });
+						$scope.list = l;
+				});
 				$scope.updatable = false;
 		};
 
@@ -49,10 +49,10 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 				// Make a new list from the array.
 				ids.forEach(function(e, i, a) {
-												var eid = e.replace("list-item-", "");
-												var id = parseInt(eid);
-												items.push($scope.list.Items[id]);
-										});
+						var eid = e.replace("list-item-", "");
+						var id = parseInt(eid);
+						items.push($scope.list.Items[id]);
+				});
 
 				// Set the list ot be the newly made list.				
 				$scope.list.Items = items;
@@ -68,25 +68,27 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 				// We unshift to add it to the top.
 				$scope.list.Items.unshift({
-																	 "Name": $scope.newitem,
-																	 "Completed": false,
-																	 "Delete": false
-															 });
+						"Name": $scope.newitem,
+						"Completed": false,
+						"Delete": false
+				});
 				$scope.dirty = true;
 				$scope.newitem = "";
 		};
 
-		// pluralize attempts to add the pluralization at the end of a word (s or es).
+		// pluralize attempts to add the pluralization at the end of a
+		// word (s or es).
 		$scope.pluralize = function(e) {
 				if(/^ +$/.test(e)) return e;
 
 				if (/s$/.test(e))
 						return e + "es";
-						
+
 				return e + "s";
 		};
 
-		// depluralize attempts to remove the pluralization at the end of a word (s or es).
+		// depluralize attempts to remove the pluralization at the end of
+		// a word (s or es).
 		$scope.depluralize = function(e) {
 				if (/[^aeiou]es$/.test(e))
 						return e.replace(/s$/, '');
@@ -97,7 +99,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 								e = e.replace(/s$/, '');
 						}
 				}
-				
+
 				return e;
 		};
 
@@ -120,7 +122,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				var units = [];
 				var name = [];
 				var modifiers = [];
-				
+
 
 				// Loop through each chunk.
 				for (var x = 0; x < chunks.length; x++) {
@@ -138,13 +140,13 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 								continue;
 						} 
-						
+
 						if (e.indexOf('(') == 0 && state != NAME) {
 								prev = state;
 								state = INPAREN;
 								continue;
 						}	
-						
+
 						// Check the quantity state.
 						if (state == QTY) {
 								// See if we are still getting a number.
@@ -174,7 +176,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						// current value through to here.
 						if (state == UNIT) {
 								if ($.inArray(e, window.Units) > -1) {
-										units.push($scope.depluralize(e));
+										units.push(e);
 										plus = false;
 										continue;
 								} 
@@ -229,16 +231,11 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				// Join the modifiers and name
 				var joinedname = modifiers.sort().join(', ') + " " + name.join(' ');
 
-				// Attempt to remove the end of the last word it it's pluralized.
-				joinedname = $scope.depluralize(joinedname);
-
 				if (qty.length == 0)
 						qty.push("1");
 
 				if (units.length == 0)
 						units.push('>!<');
-
-				console.log(joinedname, qty, units);
 
 				return {
 						name: joinedname,
@@ -250,19 +247,19 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		// normalize attempts to combine the given quantities into a
 		// single quantity.
 		$scope.normalize = function(quantities) {
-				console.log(quantities);
 				var combined = {};
-				
+
 				for (var x = 0; x < quantities.length; x++) {
 						var quantity = quantities[x];
+						var unit = $scope.depluralize(quantity.units);
 
 						// Initilize to 0 if we haven't seen this unit yet.
-						if (combined[quantity.units] == null || combined[quantity.units] == undefined) {
-								combined[quantity.units] = 0;
+						if (combined[unit] == null || combined[unit] == undefined) {
+								combined[unit] = 0;
 						}
 
 						// Add the quantity to the unit.
-						combined[quantity.units] += eval(quantity.quantity);
+						combined[unit] += eval(quantity.quantity);
 				}
 
 				// Join all the separate units. We should eventually attempt
@@ -270,7 +267,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 				var total = "";
 				for (var unit in combined) {
 						total += combined[unit].toFixed(2) + " ";
-						
+
 						if (unit != '>!<') {
 								if (combined[unit] > 1)
 										total += $scope.pluralize(unit);
@@ -288,7 +285,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		// to find similar elements and combine their parts.
 		$scope.combine = function() {
 				$scope.dirty = true;
- 
+
 				// This is the list of items and their key and current
 				// quantities.
 				var merged = {};
@@ -297,9 +294,11 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						if (e.Completed || e.Delete) return;
 						var parts = $scope.split(e.Name);
 
+						parts.depname = $scope.depluralize(parts.name);
+
 						// Add the item if we don't have it.
-						if (merged[parts.name] == undefined || merged[parts.name] == null) {
-								merged[parts.name] = {
+						if (merged[parts.depname] == undefined || merged[parts.depname] == null) {
+								merged[parts.depname] = {
 										quantities: [],
 										index: i,
 										key: e.Key
@@ -311,23 +310,23 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 						}
 
 						// Add the quantitys and units to the item.
-						var found = merged[parts.name];
-								
+						var found = merged[parts.depname];
+
 						// Add each item one at at a time.
 						for (var x = 0; x < parts.quantity.length; x++) {
 								var unit = "";
 								if (x < parts.units.length)
 										unit = parts.units[x];
-								
+
 								found.quantities.push({quantity: parts.quantity[x], units: unit});
 						}
-						
+
 				});
 
 				// Now we need to merge the quantities and save them to the right item.
-				for (var name in merged) {
-						var n = $scope.normalize(merged[name].quantities)
-								+ " " + name;
+				for (var depname in merged) {
+						var n = $scope.normalize(merged[depname].quantities)
+										+ " " + depname;
 						n = n.trim();
 						n = n.replace('/  /g', ' ')
 								.replace(/\.13/g, ' 1/8')
@@ -338,7 +337,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 								.replace(/\.00/g, '')
 								.replace(/ 0 /g, ' ')
 								.replace(/^0/, '');
-						$scope.list.Items[merged[name].index].Name = n;
+						$scope.list.Items[merged[depname].index].Name = n;
 				}
 		};
 
@@ -346,19 +345,19 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		$scope.sure = function() {
 				$scope.list.Items
 						.forEach(function (e) {
-												 if (e.Completed) {
-														 e.Delete = true;
-												 }
-										 });
+								if (e.Completed) {
+										e.Delete = true;
+								}
+						});
 				$scope.dirty = true;
 		};
 
 		// save saves changes to the list and update the list.
 		$scope.save = function() {
 				Lists.save($scope.list, function(l){
-											$scope.list = l;
-											$scope.dirty = false;
-									});
+						$scope.list = l;
+						$scope.dirty = false;
+				});
 		};
 
 		// dirty is a helper function that marks the list dirty when an
@@ -372,7 +371,7 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 		$scope.noshow = function(item) {
 				return !item.Delete;
 		};
-		
+
 		// edit changes the state of the item being edited. There 
 		// are two special values: -1 is for no item, and -2 is the 
 		// title of the list.
@@ -383,17 +382,17 @@ function ListsViewCtrl($scope, $routeParams, $timeout, Lists) {
 
 		// Get the list items.
 		Lists.get($routeParams.id, function(l) {
-								 $scope.list = l;
+				$scope.list = l;
 
-								 // Make the list sortable.
-								 $("#sortablelist")
-										 .sortable({
-																	 handle: '.drag-icon',
-																	 stop: function() {
-																			 $scope.$apply($scope.sort());
-																	 }
-															 });
-						 });
+				// Make the list sortable.
+				$("#sortablelist")
+						.sortable({
+								handle: '.drag-icon',
+								stop: function() {
+										$scope.$apply($scope.sort());
+								}
+						});
+		});
 
 		// We start out not editing any list.
 		$scope.editing = -1;
