@@ -14,9 +14,10 @@ import (
 
 // GetAllRecipes fetches all of the recipes.
 func GetAllRecipes(w http.ResponseWriter, r *http.Request) {
+
 	// Create the query.
 	c := appengine.NewContext(r)
-	q := datastore.NewQuery("Recipe").Order("-LastModified")
+	q := datastore.NewQuery("Recipe").Order("Name")
 
 	// Fetch the recipes. 
 	recipes := []Recipe{}

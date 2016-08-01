@@ -15,7 +15,17 @@ indexes:
   properties:
   - name: Order
 
+- kind: Link
+  properties:
+  - name: Tags
+  - name: Name
+
 - kind: List
   ancestor: yes
   properties:
   - name: LastModified
+
+- kind: Recipe
+  ancestor: yes
+  properties:
+  - name: Name

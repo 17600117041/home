@@ -8,6 +8,7 @@ package rest
 
 import (
 	"github.com/icub3d/gorca"
+	"github.com/icub3d/home/rest/link"
 	"github.com/icub3d/home/rest/list"
 	"github.com/icub3d/home/rest/recipe"
 	"github.com/icub3d/home/rest/user"
@@ -20,6 +21,9 @@ func init() {
 
 	// Manage the lists
 	http.Handle("/rest/list/", list.MakeMuxer("/rest/list/"))
+
+	// Manage the links
+	http.Handle("/rest/link/", link.MakeMuxer("/rest/link/"))
 
 	// Manage the recipes
 	http.Handle("/rest/recipe/", recipe.MakeMuxer("/rest/recipe/"))

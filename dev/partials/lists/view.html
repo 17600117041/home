@@ -15,7 +15,13 @@
 
 		<div class="clearfix">
 			<!-- The table header with buttons. -->
-			<div class="pad-bottom pull-right">
+			<div>
+				<button class="btn btn-info" 
+								title="Merge Similar Items"
+								data-ng-click="combine()">
+					<i class="icon-list icon-white"></i>
+					Merge
+				</button>
 				<a role="button" class="btn btn-warning" 
 					 href="#cleanModal" data-toggle="modal">
 					<i class="icon-trash icon-white"></i>
@@ -40,7 +46,7 @@
 					Save
 				</button>
 			</div>
-			<div class="pad-bottom pull-left">
+			<div class="pad-bottom">
 				<form name="addForm" class="form-inline"> 
 					<div class="control-group pull-left"
 							 data-ng-class="{error: addForm.newitem.$invalid}">
